@@ -42,7 +42,7 @@ Gejala → Penyebab → Perbaikan → Hasil Uji Ulang
 Jika seluruh implementasi langsung berjalan sesuai hasil yang diharapkan, jelaskan hasil pemeriksaan sintaks dan pengujian yang telah dilakukan.
 
 ## 8. Bukti Tangkapan Layar
-Sisipkan gambar yang relevan dari folder dokumentasi/ dengan perintah:
+[Sisipkan gambar yang relevan dari folder dokumentasi/ dengan perintah:]
 
 ### Gambar 1. Hasil Pengujian Halaman Utama 
 ![Gambar 1 - Halaman Utama](dokumentasi/gambar1.jpg) 
