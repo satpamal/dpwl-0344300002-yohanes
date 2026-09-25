@@ -5,6 +5,27 @@
 
 ## 2. Struktur Direktori
 [Tampilkan tree struktur P2 dan jelaskan fungsi setiap bagian.]
+BASE: C:\laragon\www\SINAKAMAWAN
+├─ Sistem INformasi AKAdemik MAhasiswa karyaWAN.txt
+├─ config
+│  ├─ Database.php ==> koneksi ke database
+│  └─ Koneksi.php ==> koneksi ke database
+├─ controllers
+│  ├─ DashboardController.php ==> koding untuk dashboard hubungan model dan view
+│  └─ MahasiswaController.php
+├─ generatestrukturdirektorifile.php
+├─ index.php
+├─ models
+│  ├─ DashboardModel.php
+│  └─ MahasiswaModel.php
+├─ query yang dicoba.sql
+└─ views
+   ├─ layouts
+   │  ├─ footer.php
+   │  ├─ header.php
+   │  └─ sidebar.php
+   └─ mahasiswa
+      └─ index.php
 
 ## 3. Front controller
 [Jelaskan peran index.php sebagai satu titik masuk aplikasi.]
@@ -46,6 +67,8 @@ Jika seluruh implementasi langsung berjalan sesuai hasil yang diharapkan, jelask
 
 ### Gambar 1. Hasil Pengujian Halaman Utama 
 ![Gambar 1 - Halaman Utama](dokumentasi/gambar1.jpg) 
+![gambar1](images/gambar1.jpg)
+
 
 ### Gambar 2. Hasil Pengujian Custom Route 
 ![Gambar 2 - Custom Route](dokumentasi/gambar2.jpg)
