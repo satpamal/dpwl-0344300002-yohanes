@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
 define('APPPATH', FCPATH . 'application' . DIRECTORY_SEPARATOR);

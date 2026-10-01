@@ -70,13 +70,28 @@ $adminlte_url = base_url('../template/AdminLTE-2.4.18/');
     <div class="login-box-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
-      <form action="../../index2.html" method="post">
+      <?php if (!empty($error)): ?>
+        <div class="alert alert-danger">
+          <?= htmlspecialchars(
+            $error,
+            ENT_QUOTES,
+            'UTF-8'
+          ) ?>
+        </div>
+      <?php endif; ?>
+
+      <form method="post"
+        action="<?= htmlspecialchars(
+                  site_url('auth/login'),
+                  ENT_QUOTES,
+                  'UTF-8'
+                ) ?>">
         <div class="form-group has-feedback">
-          <input type="email" class="form-control" placeholder="Email">
+          <input type="text" name="username" class="form-control" placeholder="Username">
           <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
         </div>
         <div class="form-group has-feedback">
-          <input type="password" class="form-control" placeholder="Password">
+          <input type="password" name="password" class="form-control" placeholder="Password">
           <span class="glyphicon glyphicon-lock form-control-feedback"></span>
         </div>
         <div class="row">
