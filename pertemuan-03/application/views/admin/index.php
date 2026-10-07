@@ -108,7 +108,11 @@ $adminlte_url = base_url('../template/AdminLTE-2.4.18/');
                       <a href="#">
                         <div class="pull-left">
                           <!-- User Image -->
-                          <img src="<?= $adminlte_url . 'dist/img/user2-160x160.jpg' ?>" class="img-circle" alt="User Image">
+                          <img src="<?= htmlspecialchars(
+                                      $adminlte_url . 'dist/img',
+                                      ENT_QUOTES,
+                                      'UTF-8'
+                                    ) ?>/user2-160x160.jpg" class="img-circle" alt="User Image">
                         </div>
                         <!-- Message title and timestamp -->
                         <h4>
@@ -193,17 +197,33 @@ $adminlte_url = base_url('../template/AdminLTE-2.4.18/');
               <!-- Menu Toggle Button -->
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <!-- The user image in the navbar-->
-                <img src="<?= $adminlte_url . 'dist/img/user2-160x160.jpg' ?>" class="user-image" alt="User Image">
+                <img src="<?= htmlspecialchars(
+                            $adminlte_url . 'dist/img',
+                            ENT_QUOTES,
+                            'UTF-8'
+                          ) ?>/user2-160x160.jpg" class="user-image" alt="User Image">
                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                <span class="hidden-xs"><?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="hidden-xs"><?= htmlspecialchars(
+                                          $username,
+                                          ENT_QUOTES,
+                                          'UTF-8'
+                                        ) ?></span>
               </a>
               <ul class="dropdown-menu">
                 <!-- The user image in the menu -->
                 <li class="user-header">
-                  <img src="<?= $adminlte_url . 'dist/img/user2-160x160.jpg' ?>" class="img-circle" alt="User Image">
+                  <img src="<?= htmlspecialchars(
+                              $adminlte_url . 'dist/img',
+                              ENT_QUOTES,
+                              'UTF-8'
+                            ) ?>/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                   <p>
-                    <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?> - Web Developer
+                    <?= htmlspecialchars(
+                      $username,
+                      ENT_QUOTES,
+                      'UTF-8'
+                    ) ?> - Web Developer
                     <small>Member since Nov. 2012</small>
                   </p>
                 </li>
@@ -250,7 +270,11 @@ $adminlte_url = base_url('../template/AdminLTE-2.4.18/');
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel">
           <div class="pull-left image">
-            <img src="<?= $adminlte_url . 'dist/img/user2-160x160.jpg' ?>" class="img-circle" alt="User Image">
+            <img src="<?= htmlspecialchars(
+                        $adminlte_url . 'dist/img',
+                        ENT_QUOTES,
+                        'UTF-8'
+                      ) ?>/user2-160x160.jpg" class="img-circle" alt="User Image">
           </div>
           <div class="pull-left info">
             <p>
