@@ -203,7 +203,7 @@ $adminlte_url = base_url('../template/AdminLTE-2.4.18/');
                   <img src="<?= $adminlte_url . 'dist/img/user2-160x160.jpg' ?>" class="img-circle" alt="User Image">
 
                   <p>
-                   <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?> - Web Developer
+                    <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?> - Web Developer
                     <small>Member since Nov. 2012</small>
                   </p>
                 </li>
