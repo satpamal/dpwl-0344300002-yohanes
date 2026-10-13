@@ -1,23 +1,21 @@
 <?php
-// DIPERBARUI - application/config/routes.php
+// Nama Berkas - application/config/routes.php
 $route = [];
 
-// Route P2/P3 - dipertahankan.
-$route['default_controller'] = 'home';
-$route['info/(:any)'] = 'home/info/$1';
-$route['login'] = 'auth/login';
-$route['auth/login'] = 'auth/login';
-$route['auth/logout'] = 'auth/logout';
-$route['admin'] = 'admin/index';
+// Route P2/P3 - dipertahankan, penyesuaian terhadap penulisan nama Controller.
+$route['default_controller'] = 'Home';
+$route['info/(:any)'] = 'Home/info/$1';
+$route['login'] = 'Auth/login';
+$route['auth/login'] = 'Auth/login';
+$route['auth/logout'] = 'Auth/logout';
+$route['admin'] = 'Admin/index';
 
-// P4: BARU - semua proses CRUD admin dipindahkan di bawah /admin/madmin.
-$route['admin/madmin'] = 'madmin_controller/index';
-$route['admin/madmin/tambah'] = 'madmin_controller/tambah';
-$route['admin/madmin/ubah/(:any)'] = 'madmin_controller/ubah/$1';
-$route['admin/madmin/hapus/(:any)'] = 'madmin_controller/hapus/$1';
+// Route P4: semua proses CRUD admin dipindahkan di URL /admin/madmin.
+$route['admin/madmin'] = 'Madmin_controller/index';
+$route['admin/madmin/tambah'] = 'Madmin_controller/tambah';
+$route['admin/madmin/ubah/(:any)'] = 'Madmin_controller/ubah/$1';
+$route['admin/madmin/hapus/(:any)'] = 'Madmin_controller/hapus/$1';
 
-// dikerjakan pada P5
-$route['admin/mobil'] = 'mobil_controller/index'; #menu yang memanggil view mobil
-$route['admin/mobil/tambah'] = 'mobil_controller/tambah'; #saat tombol tambah diklik
-$route['admin/mobil/ubah/(:any)'] = 'mobil_controller/ubah/$1';
-$route['admin/mobil/hapus/(:any)'] = 'mobil_controller/hapus/$1';
+// Route P5
+// dari href(menu), diproses ke Mobil_controller dengan mengerjakan method index() yang memanggil admin/mobil_view
+$route['admin/mobil'] = 'Mobil_controller/index';
