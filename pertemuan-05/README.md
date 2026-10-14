@@ -10,3 +10,5 @@ Pengembangan yang dilakukan:
 7. membuat method create() di application\models\Mobil_model.php.
 8. membuat method tambah(), hapusFotoBaru(), uploadFoto(), validateMobilInput(), renderMobil() di application\controllers\Mobil_controller.php
 9. membuat formulir tambah kendaraan di application\views\admin\mobil_view.php.
+10. mencoba menambahkan data kendaraan baru pada manajemen data kendaraan. berhasil.
+11. 
