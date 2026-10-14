@@ -47,22 +47,22 @@ class Mobil_model
   public function create(array $data): bool
   {
     $sql = "
-    INSERT INTO t_mobil (
-      no_plat,
-      nm_mobil,
-      nkursi,
-      nbagasi,
-      jns_mobil,
-      transmisi,
-      thn_buat,
-      ft_depan,
-      ft_blkg,
-      ft_interior,
-      hrg_hari,
-      cttn_unit,
-      status_unit
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  ";
+        INSERT INTO t_mobil (
+          no_plat,
+          nm_mobil,
+          nkursi,
+          nbagasi,
+          jns_mobil,
+          transmisi,
+          thn_buat,
+          ft_depan,
+          ft_blkg,
+          ft_interior,
+          hrg_hari,
+          cttn_unit,
+          status_unit
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ";
 
     $stmt = $this->db->prepare($sql);
 

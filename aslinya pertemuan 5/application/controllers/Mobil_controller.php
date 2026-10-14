@@ -104,7 +104,6 @@ class Mobil_controller extends Controller
     exit;
   }
 
-
   public function ubah(string $noPlat): void
   {
     require_admin_login();
@@ -176,8 +175,11 @@ class Mobil_controller extends Controller
 
     if (!$success) {
       $this->hapusFotoBaru($uploadedFiles);
-      $this->renderMobil('ubah', array_merge($mobilLama, $data),
-        'Data kendaraan gagal diperbarui. Periksa kembali data yang dimasukkan.');
+      $this->renderMobil(
+        'ubah',
+        array_merge($mobilLama, $data),
+        'Data kendaraan gagal diperbarui. Periksa kembali data yang dimasukkan.'
+      );
       return;
     }
 

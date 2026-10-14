@@ -14,3 +14,6 @@ Pengembangan yang dilakukan:
 11. menambahkan method findByNoPlat() di application\models\Mobil_model.php untuk menampilkan data kendaraan yang dipilih pada form.
 12. menambahkan method update() di application\models\Mobil_model.php untuk melakukan query update terhadap t_mobil dimana no_plat sesuai yang dipilih.
 13. Menambahkan method ubah() di application\controllers\Mobil_controller.php
+14. Menambahkan method delete di application\models\Mobil_model.php untuk query DELETE ke tabel t_mobil
+15. Menambahkan method hapus() di application\controllers\Mobil_controller.php untuk eksekusi method delete setelah penghapusan di konfirmasi.
+16. Menguji penghapusan kendaraan. berhasil menghapus record t_mobil dan foto kendaraan di C:\laragon\www\dpwl-0344300002\uploads\mobil
