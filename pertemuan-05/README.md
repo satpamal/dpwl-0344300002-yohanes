@@ -3,4 +3,7 @@
 Pengembangan yang dilakukan:
 1. menambah menu Manajemen Kendaraan di sidebar.php, menambah route untuk controller Mobil_controller khusus method index di routes.php
 2. menambah route ke controller Mobil untuk method tambah, ubah, hapus di routes.php
-3. 
+3. membuat berkas application/models/Mobil_model.php untuk operasi CRUD tabel t_mobil.
+4. menambahkan method getAll() untuk membaca seluruh data mobil pada application/models/Mobil_model.php
+5. membuat application\controllers\Mobil_controller.php dan memuat models/Mobil_model.php, helpers/auth_helper.php, dan helpers/flash_helper.php
+6. membuat view untuk daftar mobil di application\views\admin\mobil_view.php, tambah, ubah, hapus di tahap selanjutnya.
