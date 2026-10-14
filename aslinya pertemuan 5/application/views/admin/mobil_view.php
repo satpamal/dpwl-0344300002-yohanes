@@ -262,8 +262,7 @@ $h = static fn($value): string => htmlspecialchars((string) ($value ?? ''), ENT_
                       class="img-thumbnail current-photo"
                       src="<?= $h(base_url('uploads/mobil/' . rawurlencode($mobil_dipilih[$field]))) ?>"
                       alt="<?= $h($label) ?> saat ini"
-                      style="width: 180px; height: 120px; object-fit: cover;"
-                    >
+                      style="width: 180px; height: 120px; object-fit: cover;">
                     <p class="help-block current-photo-name"><?= $h($mobil_dipilih[$field]) ?>. Kosongkan jika tidak ingin menggantinya.</p>
                   <?php else: ?>
                     <p class="help-block current-photo-label">Belum ada foto tersimpan.</p>
@@ -273,8 +272,7 @@ $h = static fn($value): string => htmlspecialchars((string) ($value ?? ''), ENT_
                     <img
                       class="img-thumbnail new-photo-image"
                       alt="Pratinjau <?= $h($label) ?> yang dipilih"
-                      style="width: 180px; height: 120px; object-fit: cover;"
-                    >
+                      style="width: 180px; height: 120px; object-fit: cover;">
                   </div>
                 </div>
               </div>
@@ -298,44 +296,44 @@ $h = static fn($value): string => htmlspecialchars((string) ($value ?? ''), ENT_
 <?php require APPPATH . '/views/templates/footer.php'; ?>
 
 <?php if ($isForm): ?>
-<script>
-  (function () {
-    'use strict';
+  <script>
+    (function() {
+      'use strict';
 
-    document.querySelectorAll('.form-group input[type="file"][name^="ft_"]').forEach(function (input) {
-      var container = input.closest('.form-group');
-      var preview = container ? container.querySelector('.new-photo-preview') : null;
-      var image = preview ? preview.querySelector('.new-photo-image') : null;
-      var previousUrl = null;
+      document.querySelectorAll('.form-group input[type="file"][name^="ft_"]').forEach(function(input) {
+        var container = input.closest('.form-group');
+        var preview = container ? container.querySelector('.new-photo-preview') : null;
+        var image = preview ? preview.querySelector('.new-photo-image') : null;
+        var previousUrl = null;
 
-      if (!preview || !image) {
-        return;
-      }
-
-      input.addEventListener('change', function () {
-        if (previousUrl) {
-          URL.revokeObjectURL(previousUrl);
-          previousUrl = null;
-        }
-
-        var file = input.files && input.files.length ? input.files[0] : null;
-        if (!file) {
-          preview.style.display = 'none';
-          image.removeAttribute('src');
+        if (!preview || !image) {
           return;
         }
 
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size < 1 || file.size > 5 * 1024 * 1024) {
-          preview.style.display = 'none';
-          image.removeAttribute('src');
-          return;
-        }
+        input.addEventListener('change', function() {
+          if (previousUrl) {
+            URL.revokeObjectURL(previousUrl);
+            previousUrl = null;
+          }
 
-        previousUrl = URL.createObjectURL(file);
-        image.src = previousUrl;
-        preview.style.display = 'block';
+          var file = input.files && input.files.length ? input.files[0] : null;
+          if (!file) {
+            preview.style.display = 'none';
+            image.removeAttribute('src');
+            return;
+          }
+
+          if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size < 1 || file.size > 5 * 1024 * 1024) {
+            preview.style.display = 'none';
+            image.removeAttribute('src');
+            return;
+          }
+
+          previousUrl = URL.createObjectURL(file);
+          image.src = previousUrl;
+          preview.style.display = 'block';
+        });
       });
-    });
-  })();
-</script>
+    })();
+  </script>
 <?php endif; ?>

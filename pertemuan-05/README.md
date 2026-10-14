@@ -7,3 +7,6 @@ Pengembangan yang dilakukan:
 4. menambahkan method getAll() untuk membaca seluruh data mobil pada application/models/Mobil_model.php
 5. membuat application\controllers\Mobil_controller.php dan memuat models/Mobil_model.php, helpers/auth_helper.php, dan helpers/flash_helper.php
 6. membuat view untuk daftar mobil di application\views\admin\mobil_view.php, tambah, ubah, hapus di tahap selanjutnya.
+7. membuat method create() di application\models\Mobil_model.php.
+8. membuat method tambah(), hapusFotoBaru(), uploadFoto(), validateMobilInput(), renderMobil() di application\controllers\Mobil_controller.php
+9. membuat formulir tambah kendaraan di application\views\admin\mobil_view.php.
