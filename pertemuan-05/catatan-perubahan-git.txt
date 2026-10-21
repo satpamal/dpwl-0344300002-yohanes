@@ -1,0 +1,57 @@
+﻿CATATAN PERUBAHAN GIT DPWL
+Folder: C:\laragon\www\dpwl-0344300002-yohanes\pertemuan-05
+Tanggal laporan: 2026-10-20 10.03.22
+
+===== 1. BRANCH DAN STATUS REPOSITORI =====
+## main...origin/main
+?? catatan-perubahan-git.txt
+
+===== 2. RIWAYAT 30 COMMIT TERAKHIR =====
+49d8843 | 2026-10-16T08:33:42+07:00 | Yohanes Setiawan Japriadi | perbaikan readme.md pertemuan-05
+8d20beb | 2026-10-14T19:34:50+07:00 | Yohanes Setiawan Japriadi | finishing kode final untuk pertemuan-05
+08b65e6 | 2026-10-14T19:19:48+07:00 | Yohanes Setiawan Japriadi | mencoba fitur delete kendaraan
+e4b6ea7 | 2026-10-14T17:45:21+07:00 | Yohanes Setiawan Japriadi | memperbaharui model, controller, dan view mobil agar bisa menampilkan data ke form sekaligus update
+2b97af5 | 2026-10-14T16:10:42+07:00 | Yohanes Setiawan Japriadi | menyelesaikan ujicoba tambah data kendaraan. berhasil
+5e3de76 | 2026-10-14T13:47:11+07:00 | Yohanes Setiawan Japriadi | selesai menambahkan form tambah kendaraan
+93ba894 | 2026-10-14T10:52:45+07:00 | Yohanes Setiawan Japriadi | menyelesaikan fitur READ data kendaraan
+4a521c6 | 2026-10-14T08:58:14+07:00 | Yohanes Setiawan Japriadi | menambah route ke controller Mobil untuk method tambah, ubah, hapus di routes.php
+74d868a | 2026-10-13T16:16:02+07:00 | Yohanes Setiawan Japriadi | update pertemuan-05/README.md tahap 1
+72821d7 | 2026-10-13T16:12:17+07:00 | Yohanes Setiawan Japriadi | menambah menu Manajemen Kendaraan di sidebar.php, menambah route untuk controller Mobil_controller khusus method index di routes.php
+f89175f | 2026-10-13T13:03:14+07:00 | Yohanes Setiawan Japriadi | perbaikan penampil gambar pada mobil view
+60a4085 | 2026-10-11T08:46:31+07:00 | Yohanes Setiawan Japriadi | views admin index.php dimodifikasi
+f3c85c5 | 2026-10-08T12:10:18+07:00 | Yohanes Setiawan Japriadi | finishing p4
+4f93222 | 2026-10-08T07:08:50+07:00 | Yohanes Setiawan Japriadi | finishing latihan pertemuan-03
+e6e5e13 | 2026-10-07T20:17:35+07:00 | Yohanes Setiawan Japriadi | perbaikan sumber gambar dan nama yang login
+4301903 | 2026-10-07T20:06:10+07:00 | Yohanes Setiawan Japriadi | Menerapkan pola Post-Redirect-Get pada autentikasi
+0d9c166 | 2026-10-07T17:33:40+07:00 | Yohanes Setiawan Japriadi | Merge branch 'main' of https://github.com/satpamal/dpwl-0344300002-yohanes
+26555f1 | 2026-10-07T17:33:30+07:00 | Yohanes Setiawan Japriadi | Integrasi route autentikasi dan halaman admin
+5a71810 | 2026-10-07T09:16:36+07:00 | satpamal | memperbarui README p3
+18f2d05 | 2026-10-06T22:24:46+07:00 | satpamal | docs(p4): perbarui readme pertemuan 04
+0e6edf0 | 2026-10-06T22:21:45+07:00 | satpamal | test(p4): dokumentasi uji crud dan access control
+178f45b | 2026-10-06T22:18:34+07:00 | satpamal | feat(p4): tambah view manajemen admin
+4d0b085 | 2026-10-06T22:13:12+07:00 | satpamal | feat(p4): sesuaikan admin/index.php
+c9a9d83 | 2026-10-06T22:08:17+07:00 | satpamal | pisahkan template header sidebar footer
+e900fd2 | 2026-10-06T22:00:11+07:00 | satpamal | feat(p4): menambah routes
+dac1085 | 2026-10-06T21:57:38+07:00 | satpamal | feat(p4): tambah Madmin_controller
+d0864f7 | 2026-10-06T21:55:38+07:00 | satpamal | feat(p4): tambah crud admin pada Admin_model
+19736ab | 2026-10-06T21:51:54+07:00 | satpamal | feat(p4): tambah flash_helper
+e3d8d4e | 2026-10-06T21:48:15+07:00 | satpamal | feat(p4): tambah pertemuan-04
+9e327a1 | 2026-10-04T10:44:43+07:00 | satpamal | disable tombol login tidak terpakai
+
+
+===== 3. RINGKASAN PERUBAHAN YANG BELUM DI-COMMIT =====
+
+===== 4. DAFTAR FILE YANG BERUBAH TERHADAP COMMIT SAAT INI =====
+
+===== 5. FILE BARU YANG BELUM DILACAK GIT =====
+catatan-perubahan-git.txt
+
+===== 6. DAFTAR FILE DALAM COMMIT TERAKHIR =====
+49d8843 perbaikan readme.md pertemuan-05
+ pertemuan-05/README.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+===== 7. TAG GIT YANG TERSEDIA =====
+
+===== 8. REMOTE REPOSITORI =====
+origin

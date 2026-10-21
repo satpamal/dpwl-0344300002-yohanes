@@ -1,0 +1,38 @@
+
+$ErrorActionPreference = "Stop"
+
+$report = Join-Path (Get-Location) "catatan-perubahan-git.txt"
+
+if (-not (Test-Path (Join-Path (Get-Location) ".git"))) {
+    throw "Folder ini tidak memiliki direktori .git. Pastikan Anda berada di folder repositori yang benar."
+}
+
+"CATATAN PERUBAHAN GIT DPWL" | Set-Content $report -Encoding utf8
+"Folder: $(Get-Location)" | Add-Content $report -Encoding utf8
+"Tanggal laporan: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Add-Content $report -Encoding utf8
+
+"`n===== 1. BRANCH DAN STATUS REPOSITORI =====" | Add-Content $report -Encoding utf8
+git status --short --branch 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 2. RIWAYAT 30 COMMIT TERAKHIR =====" | Add-Content $report -Encoding utf8
+git log -30 --date=iso-strict --pretty=format:"%h | %ad | %an | %s" 2>&1 | Add-Content $report -Encoding utf8
+
+"`n`n===== 3. RINGKASAN PERUBAHAN YANG BELUM DI-COMMIT =====" | Add-Content $report -Encoding utf8
+git diff HEAD --stat 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 4. DAFTAR FILE YANG BERUBAH TERHADAP COMMIT SAAT INI =====" | Add-Content $report -Encoding utf8
+git diff HEAD --name-status 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 5. FILE BARU YANG BELUM DILACAK GIT =====" | Add-Content $report -Encoding utf8
+git ls-files --others --exclude-standard 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 6. DAFTAR FILE DALAM COMMIT TERAKHIR =====" | Add-Content $report -Encoding utf8
+git show --stat --oneline --summary HEAD 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 7. TAG GIT YANG TERSEDIA =====" | Add-Content $report -Encoding utf8
+git tag --list 2>&1 | Add-Content $report -Encoding utf8
+
+"`n===== 8. REMOTE REPOSITORI =====" | Add-Content $report -Encoding utf8
+git remote 2>&1 | Add-Content $report -Encoding utf8
+
+Write-Host "Laporan selesai dibuat: $report" -ForegroundColor Green
