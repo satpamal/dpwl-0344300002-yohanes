@@ -6,4 +6,5 @@ Pengujian dan pengembangan yang dilakukan:
 2. memeriksa index.html, shop.html, shop-single.html dari templateMo Zay Shop untuk dianalisa strukturnya mana yang berupa header, konten, navigasi, dan footer.
 3. membuat route, controller, model, view khusus katalog kendaraan.
 4. membuat route khusus detail kendaraan setelah foto atau nama kendaraan diklik, membuat method detail() pada controller Katalog, membuat view detail.
-5. menambahkan route untuk registrasi penyewa, 
+5. menambahkan route untuk registrasi penyewa, membuat application\models\Penyewa_model.php, mengubah application\controllers\Auth.php untuk method register(), menambahkan view untuk register ke application\views\auth\register.php, ujicoba registrasi penyewa.
+6. 
