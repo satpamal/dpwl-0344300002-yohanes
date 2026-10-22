@@ -206,14 +206,14 @@ class Penyewa_model
   ): bool {
     if ($passwordHash !== null) {
       $sql = "UPDATE t_penyewa
-            SET nik = ?,
-                nm_lngkp = ?,
-                no_hp = ?,
-                almt_lngkp = ?,
-                ft_ktp = ?,
-                ft_sim_a = ?,
-                sandi = ?
-            WHERE user_plg = ?";
+          SET nik = ?,
+              nm_lngkp = ?,
+              no_hp = ?,
+              almt_lngkp = ?,
+              ft_ktp = ?,
+              ft_sim_a = ?,
+              sandi = ?
+          WHERE user_plg = ?";
 
       $stmt = $this->db->prepare($sql);
 
@@ -236,13 +236,13 @@ class Penyewa_model
       );
     } else {
       $sql = "UPDATE t_penyewa
-            SET nik = ?,
-                nm_lngkp = ?,
-                no_hp = ?,
-                almt_lngkp = ?,
-                ft_ktp = ?,
-                ft_sim_a = ?
-            WHERE user_plg = ?";
+          SET nik = ?,
+              nm_lngkp = ?,
+              no_hp = ?,
+              almt_lngkp = ?,
+              ft_ktp = ?,
+              ft_sim_a = ?
+          WHERE user_plg = ?";
 
       $stmt = $this->db->prepare($sql);
 
