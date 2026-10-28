@@ -15,18 +15,21 @@ $route = [];
 require APPPATH . 'config/routes.php';
 
 // P6 menghilangkan penulisan index.php pada URL aplikasi
-/*$uri = $_SERVER['PATH_INFO'] ?? '';
+/* $uri = $_SERVER['PATH_INFO'] ?? '';
 
 if ($uri === '') {
-    $requestPath = parse_url(
-        $_SERVER['REQUEST_URI'] ?? '/',
-        PHP_URL_PATH
-    ) ?? '/';
+  $requestPath = parse_url(
+    $_SERVER['REQUEST_URI'] ?? '/',
+    PHP_URL_PATH
+  ) ?? '/';
 
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+  $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
 
-    if (str_starts_with($requestPath, $scriptName)) {
-        $uri = substr($requestPath, strlen($scriptName));
-    }
+  if (str_starts_with($requestPath, $scriptName)) {
+    $uri = substr($requestPath, strlen($scriptName));
+  }
 } */
 $uri = $_GET['route'] ?? ($_SERVER['PATH_INFO'] ?? '');
+
+$router = new Router($route);
+$router->dispatch($uri);
