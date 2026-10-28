@@ -147,10 +147,10 @@ class Transaksi_model
 
     $stmt = $this->db->prepare(
       "SELECT COUNT(*) AS jumlah
-       FROM t_pilih p
-       INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
-       WHERE s.user_plg = ?
-         AND s.status_sewa = 'keranjang'"
+      FROM t_pilih p
+      INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
+      WHERE s.user_plg = ?
+        AND s.status_sewa = 'keranjang'"
     );
 
     if (!$stmt) {
