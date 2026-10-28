@@ -11,14 +11,15 @@ Pengujian dan pengembangan yang dilakukan:
 7. Menampilkan flash message dan jumlah mobil aktual serta link ke keranjang menggunakan <?= $e(site_url('transaksi/keranjang')) ?> pada application\views\katalog\navbar.php termasuk menampilkan nilai dari method jumlahKeranjang dari Controller.
 8. modifikasi application\models\Transaksi_model.php untuk menambahkan method getJumlahMobilKeranjang().
 9. Modifikasi application\controllers\Katalog_controller.php untuk mengirim jumlah keranjang ke halaman katalog dan detail katalog. menambah require_once APPPATH . 'models/Transaksi_model.php';, menambah properti private Transaksi_model $transaksiModel;, menambah inisialisasi model $this->transaksiModel = new Transaksi_model();, 
-10. 
-11. membuat application/views/transaksi/keranjang.php
-12. 
+10. menyesuaikan application\controllers\Penyewa_controller.php untuk mengirim jumlah keranjang karena jumlah keranjang kosong pada profil dengan pemanggilam model menggunakan require_once APPPATH . 'models/Transaksi_model.php'; properti private Transaksi_model $transaksiModel;, inisialisasi model menggunakan $this->transaksiModel = new Transaksi_model();, menambah perhitungan jumlah keranjang dengan $jumlahKeranjang = $this->transaksiModel->getJumlahMobilKeranjang($userPlg); dan mengirim parameter jumlahKeranjang di View Profil, selain itu method renderProfilError() juga mengirim variabel jumlahKeranjang. jadi semua yang memanggil view, dikirimkan variabel jumlahKeranjang.
+11. 
+12. membuat application/views/transaksi/keranjang.php
 13. 
 14. 
 15. 
-16. modifikasi method keranjang pada application\controllers\Transaksi_controller.php agar bisa menghandle dengan kode sewa kosong
-17. halaman keranjang, khususnya update setelah berhasil dipanggil. format waktu sewa dibuat 24 jam dengan select2.
-18. application\controllers\Penyewa_controller.php harus mengirim jumlah keranjang karena jumlah keranjang kosong pada profil, dibahas terakhir saja di materi untuk navbar.php.
-19. setelah keranjang selesai, lanjut ke checkout. tepatnya model melakukan validasi dan mengubah status transaksi dari keranjang menjadi diajukan menggunakan file application/views/transaksi/konfirmasi.php. selain itu membuat record pembayaran ke tabel t_bayar terkait DP 30%.
-20. selesai
+16. 
+17. modifikasi method keranjang pada application\controllers\Transaksi_controller.php agar bisa menghandle dengan kode sewa kosong
+18. halaman keranjang, khususnya update setelah berhasil dipanggil. format waktu sewa dibuat 24 jam dengan select2.
+19. 
+20. setelah keranjang selesai, lanjut ke checkout. tepatnya model melakukan validasi dan mengubah status transaksi dari keranjang menjadi diajukan menggunakan file application/views/transaksi/konfirmasi.php. selain itu membuat record pembayaran ke tabel t_bayar terkait DP 30%.
+21. selesai
