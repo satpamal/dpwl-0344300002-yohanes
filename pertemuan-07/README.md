@@ -4,7 +4,7 @@ Pengujian dan pengembangan yang dilakukan:
 1. artefak P6 pada dpwl-nim\ siap digunakan karena fitur-fitur nya sudah berfungsi dengan baik.
 1. menyalin artefak final P6 ke pertemuan-07
 2. membuat application/models/Transaksi_model.php dengan membuat method ambilKunci() dan lepasKunci(), pengkodean kode sewa menjadi INV/YYYYMMDD/NN, misalnya INV/20260702/01 menggunakan method kunciDanBuatKodeSewa().
-3. membuat application/controllers/Transaksi_controller.php
+3. membuat application/controllers/Transaksi_controller.php denan method tambah(), wajibLoginPenyewa(), wajibMetode(), redirectTambahDenganPesan(), pesanBisnisAman().
 4. membuat application/views/transaksi/keranjang.php
 5. update file application/config/routes.php agar dapat menambahkan mobil ke keranjang.
 6. memperbaiki halaman katalog dan detail untuk kondisi tombol tambah ke keranjang.
