@@ -79,8 +79,6 @@
   </a>
 </div>
 <!-- End Banner Hero -->
-
-
 <!-- Start Kategori Kendaraan -->
 <section class="container py-5">
   <div class="row text-center pt-3">
@@ -135,9 +133,6 @@
   </div>
 </section>
 <!-- End Kategori Kendaraan -->
-
-
-
 <!-- Start Katalog Kendaraan -->
 <section class="bg-light" id="katalog">
   <div class="container py-5">
@@ -190,8 +185,6 @@
                   </div>
                 <?php endif; ?>
               </div>
-
-
               <div class="card-body">
 
                 <h2 class="text-dark">
@@ -277,7 +270,4 @@
   </div>
 </section>
 <!-- End Katalog Kendaraan -->
-
-
-
 <?php require APPPATH . 'views/katalog/footer.php'; ?>

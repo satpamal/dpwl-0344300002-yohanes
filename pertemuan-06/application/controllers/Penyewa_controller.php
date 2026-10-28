@@ -1,6 +1,4 @@
-
 <?php
-
 require_once APPPATH . 'models/Penyewa_model.php';
 
 class Penyewa_controller extends Controller
