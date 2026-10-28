@@ -1,28 +1,20 @@
 <?php
 
 require_once APPPATH . 'models/Mobil_model.php';
-require_once APPPATH . 'models/Transaksi_model.php';
 
 class Katalog_controller extends Controller
 {
   private Mobil_model $mobilModel;
-  private Transaksi_model $transaksiModel;
 
   public function __construct()
   {
     $this->mobilModel = new Mobil_model();
-    $this->transaksiModel = new Transaksi_model();
   }
 
   public function index(): void
   {
-    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
-
     $data = [
-      'daftarMobil' => $this->mobilModel->getKatalog(),
-      'jumlahKeranjang' => $userPlg === ''
-        ? 0
-        : $this->transaksiModel->getJumlahMobilKeranjang($userPlg)
+      'daftarMobil' => $this->mobilModel->getKatalog()
     ];
 
     $this->view('katalog/index', $data);
@@ -37,13 +29,8 @@ class Katalog_controller extends Controller
       exit('Kendaraan tidak ditemukan.');
     }
 
-    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
-
     $this->view('katalog/detail', [
-      'mobil' => $mobil,
-      'jumlahKeranjang' => $userPlg === ''
-        ? 0
-        : $this->transaksiModel->getJumlahMobilKeranjang($userPlg)
+      'mobil' => $mobil
     ]);
   }
 }

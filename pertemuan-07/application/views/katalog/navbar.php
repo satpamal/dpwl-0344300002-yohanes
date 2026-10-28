@@ -4,11 +4,6 @@ $isPenyewaLogin = !empty($_SESSION['penyewa_user_plg']);
 $flashPenyewaNav = $_SESSION['flash_penyewa_nav'] ?? null;
 unset($_SESSION['flash_penyewa_nav']);
 
-$flashKatalog = $_SESSION['flash_katalog'] ?? null;
-unset($_SESSION['flash_katalog']);
-
-$jumlahKeranjang = max(0, (int) ($jumlahKeranjang ?? 0));
-
 $e = static function ($value): string {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 };
@@ -108,9 +103,9 @@ $e = static function ($value): string {
         </a>
 
         <?php if ($isPenyewaLogin): ?>
-          <a class="nav-icon position-relative text-decoration-none" href="<?= $e(site_url('transaksi/keranjang')) ?>" aria-label="Keranjang, <?= $jumlahKeranjang ?> kendaraan">
+          <a class="nav-icon position-relative text-decoration-none" href="#">
             <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark"><?= $jumlahKeranjang ?></span>
+            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
           </a>
 
           <!-- Ikon Profil Penyewa -->
@@ -129,31 +124,14 @@ $e = static function ($value): string {
 </nav>
 <!-- Close Header -->
 
-<?php if ($flashPenyewaNav !== null || is_array($flashKatalog)): ?>
+<?php if ($flashPenyewaNav !== null): ?>
   <div class="container-fluid px-0">
     <div class="container py-3">
-      <?php if ($flashPenyewaNav !== null): ?>
-        <div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
-          <?= $e($flashPenyewaNav) ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-      <?php endif; ?>
+      <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+        <?= $e($flashPenyewaNav) ?>
 
-      <?php if (is_array($flashKatalog)): ?>
-        <?php
-        $jenisFlash = (string) ($flashKatalog['type'] ?? 'info');
-        $kelasFlash = match ($jenisFlash) {
-          'success' => 'alert-success',
-          'error', 'danger' => 'alert-danger',
-          'warning' => 'alert-warning',
-          default => 'alert-info'
-        };
-        ?>
-        <div class="alert <?= $kelasFlash ?> alert-dismissible fade show mb-0" role="alert">
-          <?= $e($flashKatalog['message'] ?? '') ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-      <?php endif; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+      </div>
     </div>
   </div>
 <?php endif; ?>

@@ -1,16 +1,13 @@
 <?php
 require_once APPPATH . 'models/Penyewa_model.php';
-require_once APPPATH . 'models/Transaksi_model.php';
 
 class Penyewa_controller extends Controller
 {
   private Penyewa_model $model;
-  private Transaksi_model $transaksiModel;
 
   public function __construct()
   {
     $this->model = new Penyewa_model();
-    $this->transaksiModel = new Transaksi_model();
   }
 
   public function profil(): void
@@ -46,8 +43,7 @@ class Penyewa_controller extends Controller
           'profil' => $profil,
           'flash' => $flash,
           'error' => null,
-          'old' => [],
-          'jumlahKeranjang' => $this->jumlahKeranjangAktif()
+          'old' => []
         ]);
 
         return;
@@ -141,8 +137,7 @@ class Penyewa_controller extends Controller
           'profil' => $profil,
           'flash' => null,
           'error' => $error,
-          'old' => $old,
-          'jumlahKeranjang' => $this->jumlahKeranjangAktif()
+          'old' => $old
         ]);
 
         return;
@@ -256,20 +251,6 @@ class Penyewa_controller extends Controller
     }
   }
 
-  /**
-   * Menghitung kendaraan pada keranjang aktif untuk navbar halaman profil.
-   */
-  private function jumlahKeranjangAktif(): int
-  {
-    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
-
-    if ($userPlg === '') {
-      return 0;
-    }
-
-    return $this->transaksiModel->getJumlahMobilKeranjang($userPlg);
-  }
-
   private function validateProfilInput(
     string $nik,
     string $nama,
@@ -320,8 +301,7 @@ class Penyewa_controller extends Controller
       'profil' => $profil,
       'flash' => null,
       'error' => $error,
-      'old' => $old,
-      'jumlahKeranjang' => $this->jumlahKeranjangAktif()
+      'old' => $old
     ]);
   }
 
