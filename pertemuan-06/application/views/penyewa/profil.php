@@ -1,5 +1,4 @@
 <?php
-
 $e = static function ($value): string {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 };
@@ -19,7 +18,6 @@ $folderFoto = 'uploads/penyewa/';
 
 require __DIR__ . '/../katalog/header.php';
 require __DIR__ . '/../katalog/navbar.php';
-
 ?>
 
 <!-- Judul Halaman -->
@@ -42,7 +40,6 @@ require __DIR__ . '/../katalog/navbar.php';
     <div class="col-lg-8 m-auto">
       <div class="card shadow-sm">
         <div class="card-body p-4 p-lg-5">
-
           <h2 class="h4 text-success mb-3">Informasi Akun</h2>
 
           <p class="text-muted mb-4">
@@ -98,7 +95,6 @@ require __DIR__ . '/../katalog/navbar.php';
             </div>
 
             <hr class="my-4">
-
             <!-- Data profil -->
             <div class="mb-3">
               <label for="nm_lngkp" class="form-label">
@@ -152,7 +148,6 @@ require __DIR__ . '/../katalog/navbar.php';
             </div>
 
             <hr class="my-4">
-
             <!-- Ganti Password -->
             <h3 class="h5 text-success mb-3">Ganti Password</h3>
 
@@ -204,8 +199,6 @@ require __DIR__ . '/../katalog/navbar.php';
             </div>
 
             <hr class="my-4">
-
-
             <!-- Foto KTP -->
             <div class="mb-4">
               <label for="ft_ktp" class="form-label">

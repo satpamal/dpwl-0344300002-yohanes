@@ -31,5 +31,6 @@ if ($uri === '') {
 } */
 $uri = $_GET['route'] ?? ($_SERVER['PATH_INFO'] ?? '');
 
+
 $router = new Router($route);
 $router->dispatch($uri);

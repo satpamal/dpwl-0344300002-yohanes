@@ -29,7 +29,6 @@ $e = static function ($value): string {
 </nav>
 <!-- Close Top Nav -->
 
-
 <!-- Header -->
 <nav class="navbar navbar-expand-lg navbar-light shadow">
   <div class="container d-flex justify-content-between align-items-center">
@@ -89,8 +88,6 @@ $e = static function ($value): string {
           <?php endif; ?>
         </ul>
       </div>
-
-
 
       <div class="navbar align-self-center d-flex">
         <div class="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">

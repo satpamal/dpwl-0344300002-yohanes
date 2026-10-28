@@ -1,5 +1,4 @@
 <?php
-// dibuat di P5
 class Mobil_model
 {
   private mysqli $db;
@@ -8,34 +7,30 @@ class Mobil_model
     global $db;
     $this->db = $db;
   }
-
   // P5: membaca seluruh data mobil untuk halaman daftar
   public function getAll(): array
   {
     $sql = "SELECT
-            no_plat,
-            nm_mobil,
-            nkursi,
-            nbagasi,
-            jns_mobil,
-            transmisi,
-            thn_buat,
-            ft_depan,
-            ft_blkg,
-            ft_interior,
-            hrg_hari,
-            cttn_unit,
-            status_unit
-          FROM t_mobil
-          ORDER BY no_plat ASC";
-
+no_plat,
+nm_mobil,
+nkursi,
+nbagasi,
+jns_mobil,
+transmisi,
+thn_buat,
+ft_depan,
+ft_blkg,
+ft_interior,
+hrg_hari,
+cttn_unit,
+status_unit
+FROM t_mobil
+ORDER BY no_plat ASC";
     $stmt = $this->db->prepare($sql);
     $stmt->execute();
-
     $result = $stmt->get_result();
     $rows = $result->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
-
     return $rows;
   }
 
@@ -43,21 +38,20 @@ class Mobil_model
   public function create(array $data): bool
   {
     $sql = "INSERT INTO t_mobil (
-          no_plat,
-          nm_mobil,
-          nkursi,
-          nbagasi,
-          jns_mobil,
-          transmisi,
-          thn_buat,
-          ft_depan,
-          ft_blkg,
-          ft_interior,
-          hrg_hari,
-          cttn_unit,
-          status_unit
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+no_plat,
+nm_mobil,
+nkursi,
+nbagasi,
+jns_mobil,
+transmisi,
+thn_buat,
+ft_depan,
+ft_blkg,
+ft_interior,
+hrg_hari,
+cttn_unit,
+status_unit
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $this->db->prepare($sql);
     $stmt->bind_param(
       'ssiississsiss',
@@ -75,20 +69,18 @@ class Mobil_model
       $data['cttn_unit'],
       $data['status_unit']
     );
-
     $success = $stmt->execute();
     $stmt->close();
-
     return $success;
   }
 
-  // P5: Mengambil satu kendaraan berdasarkan nomor plat. untuk update
+
   public function findByNoPlat(string $noPlat): ?array
   {
     $sql = "SELECT no_plat, nm_mobil, nkursi, nbagasi, jns_mobil,
-                transmisi, thn_buat, ft_depan, ft_blkg, ft_interior,
-                hrg_hari, cttn_unit, status_unit
-          FROM t_mobil WHERE no_plat = ? LIMIT 1";
+transmisi, thn_buat, ft_depan, ft_blkg, ft_interior,
+hrg_hari, cttn_unit, status_unit
+FROM t_mobil WHERE no_plat = ? LIMIT 1";
     $stmt = $this->db->prepare($sql);
     $stmt->bind_param('s', $noPlat);
     $stmt->execute();
@@ -98,13 +90,12 @@ class Mobil_model
     return $row ?: null;
   }
 
-  // P5: Memperbarui kendaraan dengan prepared statement. setelah tombol Simpan Kendaraan diklik
   public function update(string $noPlat, array $data): bool
   {
     $sql = "UPDATE t_mobil SET nm_mobil = ?, nkursi = ?, nbagasi = ?,
-          jns_mobil = ?, transmisi = ?, thn_buat = ?, ft_depan = ?,
-          ft_blkg = ?, ft_interior = ?, hrg_hari = ?, cttn_unit = ?,
-          status_unit = ? WHERE no_plat = ?";
+jns_mobil = ?, transmisi = ?, thn_buat = ?, ft_depan = ?,
+ft_blkg = ?, ft_interior = ?, hrg_hari = ?, cttn_unit = ?,
+status_unit = ? WHERE no_plat = ?";
     $stmt = $this->db->prepare($sql);
     $stmt->bind_param(
       'siississsisss',
@@ -127,7 +118,6 @@ class Mobil_model
     return $success;
   }
 
-  // P5: Menghapus kendaraan berdasarkan nomor plat.
   public function delete(string $noPlat): bool
   {
     $stmt = $this->db->prepare("DELETE FROM t_mobil WHERE no_plat = ?");
@@ -141,21 +131,21 @@ class Mobil_model
   public function getKatalog(): array
   {
     $sql = "SELECT
-            no_plat,
-            nm_mobil,
-            nkursi,
-            nbagasi,
-            jns_mobil,
-            transmisi,
-            thn_buat,
-            ft_depan,
-            ft_blkg,
-            ft_interior,
-            hrg_hari,
-            cttn_unit,
-            status_unit
-          FROM t_mobil
-          ORDER BY nm_mobil ASC";
+          no_plat,
+          nm_mobil,
+          nkursi,
+          nbagasi,
+          jns_mobil,
+          transmisi,
+          thn_buat,
+          ft_depan,
+          ft_blkg,
+          ft_interior,
+          hrg_hari,
+          cttn_unit,
+          status_unit
+        FROM t_mobil
+        ORDER BY nm_mobil ASC";
 
     $stmt = $this->db->prepare($sql);
 
