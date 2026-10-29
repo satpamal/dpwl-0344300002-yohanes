@@ -16,7 +16,10 @@ Pengujian dan pengembangan yang dilakukan:
 11. agar zona waktu PHP mengikuti ASIA/Jakarta, maka pada index.php root harus ditambahkan date_default_timezone_set('Asia/Jakarta'); setelah session_start().
 12. memodifikasi application\models\Transaksi_model.php untuk menambahkan method namaKunciKeranjang() dan kunciKendaraan(), hitungHariSewa() dan normalisasiWaktu(), tambahKeKeranjang(), kemudian melakukan ujicoba menambahkan mobil ke keranjang.
 13. membuat halaman isi keranjang dengan berkas application/views/transaksi/keranjang.php
-19. modifikasi method keranjang pada application\controllers\Transaksi_controller.php agar bisa menghandle dengan kode sewa kosong
-20. halaman keranjang, khususnya update setelah berhasil dipanggil. format waktu sewa dibuat 24 jam dengan select2.
-21. setelah keranjang selesai, lanjut ke checkout. tepatnya model melakukan validasi dan mengubah status transaksi dari keranjang menjadi diajukan menggunakan file application/views/transaksi/konfirmasi.php. selain itu membuat record pembayaran ke tabel t_bayar terkait DP 30%.
-23. selesai
+14. 
+19. menambahkan method keranjang() pada application\controllers\Transaksi_controller.php agar bisa menghandle dengan kode sewa kosong
+20. mengatur route pada application\config\routes.php
+21. 
+22. halaman keranjang, khususnya update setelah berhasil dipanggil. format waktu sewa dibuat 24 jam dengan select2.
+23. setelah keranjang selesai, lanjut ke checkout. tepatnya model melakukan validasi dan mengubah status transaksi dari keranjang menjadi diajukan menggunakan file application/views/transaksi/konfirmasi.php. selain itu membuat record pembayaran ke tabel t_bayar terkait DP 30%.
+24. selesai
