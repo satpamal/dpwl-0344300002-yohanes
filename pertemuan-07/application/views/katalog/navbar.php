@@ -11,8 +11,8 @@ $e = static function ($value): string {
 // P7: menghitung jumlah mobil di keranjang penyewa
 $jumlahKeranjang = (int) ($jumlahKeranjang ?? 0);
 // P7: menampilkan flash message untuk katalog
-$flashKatalog = $_SESSION['flash_katalog'] ?? null;
-unset($_SESSION['flash_katalog']);
+$flashKatalog = $_SESSION['flash_transaksi'] ?? null;
+unset($_SESSION['flash_transaksi']);
 ?>
 <!-- Start Top Nav -->
 <nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
@@ -144,7 +144,7 @@ unset($_SESSION['flash_katalog']);
 
 <?php if (is_array($flashKatalog) && !empty($flashKatalog['message'])): ?>
   <div class="alert alert-<?= $e(
-                            ($flashKatalog['type'] ?? '') === 'success' ? 'success' : 'info'
+                            ($flashKatalog['type'] ?? '') === 'success' ? 'success' : 'danger'
                           ) ?> alert-dismissible fade show m-3" role="alert">
     <?= $e($flashKatalog['message']) ?>
     <button
