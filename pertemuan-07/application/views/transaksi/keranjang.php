@@ -27,7 +27,10 @@ $minTanggalSelesai = (new DateTimeImmutable((string) ($keranjang['tgl_mulai'] ??
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <style>
-  .select2-container { width: 100% !important; }
+  .select2-container {
+    width: 100% !important;
+  }
+
   .select2-container--default .select2-selection--single {
     min-height: 38px;
     border: 1px solid #ced4da;
@@ -35,16 +38,22 @@ $minTanggalSelesai = (new DateTimeImmutable((string) ($keranjang['tgl_mulai'] ??
     display: flex;
     align-items: center;
   }
+
   .select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 36px;
     padding-left: .75rem;
     color: #212529;
   }
+
   .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 36px;
     right: .35rem;
   }
-  .select2-dropdown { border-color: #ced4da; }
+
+  .select2-dropdown {
+    border-color: #ced4da;
+  }
+
   .select2-search--dropdown .select2-search__field {
     outline: none;
     border: 1px solid #ced4da;
@@ -209,155 +218,157 @@ $minTanggalSelesai = (new DateTimeImmutable((string) ($keranjang['tgl_mulai'] ??
 </section>
 
 <script>
-(() => {
-  const tanggalMulai = document.getElementById('tgl_mulai');
-  const tanggalSelesai = document.getElementById('tgl_selesai');
-  const waktuAmbil = document.getElementById('wkt_ambil');
-  const formPeriode = document.getElementById('form-periode-sewa');
+  (() => {
+    const tanggalMulai = document.getElementById('tgl_mulai');
+    const tanggalSelesai = document.getElementById('tgl_selesai');
+    const waktuAmbil = document.getElementById('wkt_ambil');
+    const formPeriode = document.getElementById('form-periode-sewa');
 
-  if (!tanggalMulai || !tanggalSelesai || !waktuAmbil || !formPeriode) return;
+    if (!tanggalMulai || !tanggalSelesai || !waktuAmbil || !formPeriode) return;
 
-  const pad = (angka) => String(angka).padStart(2, '0');
-  const formatTanggal = (tanggal) =>
-    `${tanggal.getFullYear()}-${pad(tanggal.getMonth() + 1)}-${pad(tanggal.getDate())}`;
-  const formatWaktu = (tanggal) =>
-    `${pad(tanggal.getHours())}:${pad(tanggal.getMinutes())}`;
+    const pad = (angka) => String(angka).padStart(2, '0');
+    const formatTanggal = (tanggal) =>
+      `${tanggal.getFullYear()}-${pad(tanggal.getMonth() + 1)}-${pad(tanggal.getDate())}`;
+    const formatWaktu = (tanggal) =>
+      `${pad(tanggal.getHours())}:${pad(tanggal.getMinutes())}`;
 
-  function hitungBatasWaktu() {
-    const sekarang = new Date();
-    const batas = new Date(sekarang.getTime() + 2 * 60 * 60 * 1000);
+    function hitungBatasWaktu() {
+      const sekarang = new Date();
+      const batas = new Date(sekarang.getTime() + 2 * 60 * 60 * 1000);
 
-    // Bulatkan ke menit berikutnya jika batas memiliki detik, agar tetap
-    // sekurang-kurangnya dua jam penuh dari waktu saat ini.
-    if (batas.getSeconds() > 0 || batas.getMilliseconds() > 0) {
-      batas.setMinutes(batas.getMinutes() + 1);
-    }
-    batas.setSeconds(0, 0);
-
-    const tanggalBatas = formatTanggal(batas);
-
-    tanggalMulai.min = tanggalBatas;
-    if (!tanggalMulai.value || tanggalMulai.value < tanggalBatas) {
-      tanggalMulai.value = tanggalBatas;
-    }
-
-    const mulai = new Date(`${tanggalMulai.value}T00:00:00`);
-    mulai.setDate(mulai.getDate() + 1);
-    tanggalSelesai.min = formatTanggal(mulai);
-
-    if (!tanggalSelesai.value || tanggalSelesai.value < tanggalSelesai.min) {
-      tanggalSelesai.value = tanggalSelesai.min;
-    }
-
-    const waktuSebelumnya = waktuAmbil.value || waktuAmbil.dataset.currentValue || '';
-    const batasWaktu = tanggalMulai.value === tanggalBatas
-      ? formatWaktu(batas)
-      : '00:00';
-
-    // Gunakan daftar pilihan HH:mm agar tidak bergantung pada AM/PM browser.
-    // Waktu sebelum batas tidak dibuat sebagai opsi sehingga tidak dapat dipilih.
-    waktuAmbil.replaceChildren();
-    let waktuTerpilihTersedia = false;
-
-    for (let menit = 0; menit < 24 * 60; menit++) {
-      const jam = Math.floor(menit / 60);
-      const sisaMenit = menit % 60;
-      const nilai = `${pad(jam)}:${pad(sisaMenit)}`;
-
-      if (nilai < batasWaktu) {
-        continue;
-      }
-
-      const opsi = document.createElement('option');
-      opsi.value = nilai;
-      opsi.textContent = nilai;
-
-      if (nilai === waktuSebelumnya) {
-        opsi.selected = true;
-        waktuTerpilihTersedia = true;
-      }
-
-      waktuAmbil.appendChild(opsi);
-    }
-
-    if (!waktuTerpilihTersedia && waktuAmbil.options.length > 0) {
-      waktuAmbil.selectedIndex = 0;
-    }
-
-    const label = document.getElementById('batas-waktu-mulai');
-    if (label) {
-      label.textContent = `Waktu paling awal: ${tanggalMulai.value} pukul ${batasWaktu} WIB.`;
-    }
-  }
-
-  tanggalMulai.addEventListener('change', hitungBatasWaktu);
-  tanggalSelesai.addEventListener('change', () => {
-    if (tanggalSelesai.value < tanggalSelesai.min) {
-      tanggalSelesai.value = tanggalSelesai.min;
-    }
-  });
-
-  formPeriode.addEventListener('submit', (event) => {
-    hitungBatasWaktu();
-    if (tanggalSelesai.value <= tanggalMulai.value) {
-      event.preventDefault();
-      alert('Tanggal selesai harus setelah tanggal mulai.');
-      tanggalSelesai.focus();
-      return;
-    }
-
-    if (!waktuAmbil.value) {
-      event.preventDefault();
-      alert('Pilih waktu pengambilan yang valid.');
-      waktuAmbil.focus();
-      return;
-    }
-
-    if (tanggalMulai.value === tanggalMulai.min) {
-      const batas = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      // Bulatkan ke menit berikutnya jika batas memiliki detik, agar tetap
+      // sekurang-kurangnya dua jam penuh dari waktu saat ini.
       if (batas.getSeconds() > 0 || batas.getMilliseconds() > 0) {
         batas.setMinutes(batas.getMinutes() + 1);
       }
       batas.setSeconds(0, 0);
-      if (waktuAmbil.value < formatWaktu(batas)) {
-        event.preventDefault();
-        alert('Waktu pengambilan harus minimal dua jam dari sekarang.');
-        waktuAmbil.focus();
+
+      const tanggalBatas = formatTanggal(batas);
+
+      tanggalMulai.min = tanggalBatas;
+      if (!tanggalMulai.value || tanggalMulai.value < tanggalBatas) {
+        tanggalMulai.value = tanggalBatas;
+      }
+
+      const mulai = new Date(`${tanggalMulai.value}T00:00:00`);
+      mulai.setDate(mulai.getDate() + 1);
+      tanggalSelesai.min = formatTanggal(mulai);
+
+      if (!tanggalSelesai.value || tanggalSelesai.value < tanggalSelesai.min) {
+        tanggalSelesai.value = tanggalSelesai.min;
+      }
+
+      const waktuSebelumnya = waktuAmbil.value || waktuAmbil.dataset.currentValue || '';
+      const batasWaktu = tanggalMulai.value === tanggalBatas ?
+        formatWaktu(batas) :
+        '00:00';
+
+      // Gunakan daftar pilihan HH:mm agar tidak bergantung pada AM/PM browser.
+      // Waktu sebelum batas tidak dibuat sebagai opsi sehingga tidak dapat dipilih.
+      waktuAmbil.replaceChildren();
+      let waktuTerpilihTersedia = false;
+
+      for (let menit = 0; menit < 24 * 60; menit++) {
+        const jam = Math.floor(menit / 60);
+        const sisaMenit = menit % 60;
+        const nilai = `${pad(jam)}:${pad(sisaMenit)}`;
+
+        if (nilai < batasWaktu) {
+          continue;
+        }
+
+        const opsi = document.createElement('option');
+        opsi.value = nilai;
+        opsi.textContent = nilai;
+
+        if (nilai === waktuSebelumnya) {
+          opsi.selected = true;
+          waktuTerpilihTersedia = true;
+        }
+
+        waktuAmbil.appendChild(opsi);
+      }
+
+      if (!waktuTerpilihTersedia && waktuAmbil.options.length > 0) {
+        waktuAmbil.selectedIndex = 0;
+      }
+
+      const label = document.getElementById('batas-waktu-mulai');
+      if (label) {
+        label.textContent = `Waktu paling awal: ${tanggalMulai.value} pukul ${batasWaktu} WIB.`;
       }
     }
-  });
 
-  hitungBatasWaktu();
-})();
+    tanggalMulai.addEventListener('change', hitungBatasWaktu);
+    tanggalSelesai.addEventListener('change', () => {
+      if (tanggalSelesai.value < tanggalSelesai.min) {
+        tanggalSelesai.value = tanggalSelesai.min;
+      }
+    });
+
+    formPeriode.addEventListener('submit', (event) => {
+      hitungBatasWaktu();
+      if (tanggalSelesai.value <= tanggalMulai.value) {
+        event.preventDefault();
+        alert('Tanggal selesai harus setelah tanggal mulai.');
+        tanggalSelesai.focus();
+        return;
+      }
+
+      if (!waktuAmbil.value) {
+        event.preventDefault();
+        alert('Pilih waktu pengambilan yang valid.');
+        waktuAmbil.focus();
+        return;
+      }
+
+      if (tanggalMulai.value === tanggalMulai.min) {
+        const batas = new Date(Date.now() + 2 * 60 * 60 * 1000);
+        if (batas.getSeconds() > 0 || batas.getMilliseconds() > 0) {
+          batas.setMinutes(batas.getMinutes() + 1);
+        }
+        batas.setSeconds(0, 0);
+        if (waktuAmbil.value < formatWaktu(batas)) {
+          event.preventDefault();
+          alert('Waktu pengambilan harus minimal dua jam dari sekarang.');
+          waktuAmbil.focus();
+        }
+      }
+    });
+
+    hitungBatasWaktu();
+  })();
 </script>
 
 <script defer src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-  if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
-    console.error('Select2 belum tersedia. Periksa koneksi internet atau pemuatan jQuery.');
-    return;
-  }
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
+      console.error('Select2 belum tersedia. Periksa koneksi internet atau pemuatan jQuery.');
+      return;
+    }
 
-  const $waktu = window.jQuery('#wkt_ambil');
-  $waktu.select2({
-    width: '100%',
-    placeholder: 'Pilih atau ketik waktu (HH:mm)',
-    minimumResultsForSearch: 0,
-    language: {
-      noResults: () => 'Waktu tidak ditemukan',
-      searching: () => 'Mencari waktu…',
-      searchPlaceholder: 'Ketik waktu, misalnya 18:45'
+    const $waktu = window.jQuery('#wkt_ambil');
+    $waktu.select2({
+      width: '100%',
+      placeholder: 'Pilih atau ketik waktu (HH:mm)',
+      minimumResultsForSearch: 0,
+      language: {
+        noResults: () => 'Waktu tidak ditemukan',
+        searching: () => 'Mencari waktu…',
+        searchPlaceholder: 'Ketik waktu, misalnya 18:45'
+      }
+    });
+
+    // Sinkronkan Select2 setelah opsi waktu dibangun ulang oleh validasi tanggal.
+    const waktuAmbil = document.getElementById('wkt_ambil');
+    if (waktuAmbil) {
+      const observer = new MutationObserver(() => $waktu.trigger('change.select2'));
+      observer.observe(waktuAmbil, {
+        childList: true
+      });
     }
   });
-
-  // Sinkronkan Select2 setelah opsi waktu dibangun ulang oleh validasi tanggal.
-  const waktuAmbil = document.getElementById('wkt_ambil');
-  if (waktuAmbil) {
-    const observer = new MutationObserver(() => $waktu.trigger('change.select2'));
-    observer.observe(waktuAmbil, { childList: true });
-  }
-});
 </script>
 
 <?php require APPPATH . 'views/katalog/footer.php'; ?>
