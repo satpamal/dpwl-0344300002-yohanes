@@ -8,11 +8,25 @@ $e = static function ($value): string {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 };
 
+// Mendukung format flash lama (string) dan format terstruktur (array).
+if (is_array($flashPenyewaNav)) {
+  $pesanFlash = (string) ($flashPenyewaNav['message'] ?? '');
+  $jenisFlash = (string) ($flashPenyewaNav['type'] ?? 'info');
+} else {
+  $pesanFlash = is_string($flashPenyewaNav) ? $flashPenyewaNav : '';
+  $jenisFlash = 'info';
+}
+
+$kelasFlash = [
+  'success' => 'success',
+  'error' => 'danger',
+  'danger' => 'danger',
+  'warning' => 'warning',
+  'info' => 'info'
+][$jenisFlash] ?? 'info';
+
 // P7: menghitung jumlah mobil di keranjang penyewa
 $jumlahKeranjang = (int) ($jumlahKeranjang ?? 0);
-// P7: menampilkan flash message untuk katalog
-$flashKatalog = $_SESSION['flash_transaksi'] ?? null;
-unset($_SESSION['flash_transaksi']);
 ?>
 <!-- Start Top Nav -->
 <nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
@@ -65,6 +79,13 @@ unset($_SESSION['flash_transaksi']);
               Katalog Kendaraan
             </a>
           </li>
+          <?php if ($isPenyewaLogin): ?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?= $e(site_url('pembayaran')) ?>">
+                Pembayaran Saya
+              </a>
+            </li>
+          <?php endif; ?>
 
           <?php if (!$isPenyewaLogin): ?>
             <li class="nav-item">
@@ -130,28 +151,14 @@ unset($_SESSION['flash_transaksi']);
 </nav>
 <!-- Close Header -->
 
-<?php if ($flashPenyewaNav !== null): ?>
+<?php if ($pesanFlash !== ''): ?>
   <div class="container-fluid px-0">
     <div class="container py-3">
-      <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
-        <?= $e($flashPenyewaNav) ?>
-
+      <div class="alert alert-<?= $e($kelasFlash) ?> alert-dismissible fade show mb-0" role="alert">
+        <?= $e($pesanFlash) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
       </div>
     </div>
-  </div>
-<?php endif; ?>
-
-<?php if (is_array($flashKatalog) && !empty($flashKatalog['message'])): ?>
-  <div class="alert alert-<?= $e(
-                            ($flashKatalog['type'] ?? '') === 'success' ? 'success' : 'danger'
-                          ) ?> alert-dismissible fade show m-3" role="alert">
-    <?= $e($flashKatalog['message']) ?>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Tutup"></button>
   </div>
 <?php endif; ?>
 

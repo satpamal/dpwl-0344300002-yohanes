@@ -39,7 +39,6 @@ class Katalog_controller extends Controller
 
     $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
 
-
     $this->view('katalog/detail', [
       'mobil' => $mobil,
       'jumlahKeranjang' => $userPlg === ''

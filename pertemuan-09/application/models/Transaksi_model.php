@@ -10,89 +10,173 @@ class Transaksi_model
     $this->db = $db;
   }
 
-  private function ambilKunci(
-    string $namaKunci,
-    int $timeout = 10
+  private function hitungHariSewa(
+    string $tglMulai,
+    string $tglSelesai
+  ): int {
+    $mulai = \DateTimeImmutable::createFromFormat('!Y-m-d', $tglMulai);
+    $errorMulai = \DateTimeImmutable::getLastErrors();
+
+    if (
+      $mulai === false ||
+      (
+        $errorMulai !== false &&
+        (
+          $errorMulai['warning_count'] > 0 ||
+          $errorMulai['error_count'] > 0
+        )
+      ) ||
+      $mulai->format('Y-m-d') !== $tglMulai
+    ) {
+      throw new InvalidArgumentException('Tanggal mulai tidak valid.');
+    }
+
+    $selesai = \DateTimeImmutable::createFromFormat('!Y-m-d', $tglSelesai);
+    $errorSelesai = \DateTimeImmutable::getLastErrors();
+
+    if (
+      $selesai === false ||
+      (
+        $errorSelesai !== false &&
+        (
+          $errorSelesai['warning_count'] > 0 ||
+          $errorSelesai['error_count'] > 0
+        )
+      ) ||
+      $selesai->format('Y-m-d') !== $tglSelesai
+    ) {
+      throw new InvalidArgumentException('Tanggal selesai tidak valid.');
+    }
+
+    if ($selesai <= $mulai) {
+      throw new InvalidArgumentException(
+        'Tanggal selesai harus setelah tanggal mulai.'
+      );
+    }
+
+    $hari = (int) $mulai->diff($selesai)->days;
+
+    if ($hari < 1 || $hari > 127) {
+      throw new InvalidArgumentException(
+        'Lama sewa harus antara 1 dan 127 hari.'
+      );
+    }
+
+    return $hari;
+  }
+
+  private function normalisasiWaktu(string $waktu): string
+  {
+    foreach (['H:i:s', 'H:i'] as $format) {
+      $hasil = \DateTimeImmutable::createFromFormat('!' . $format, $waktu);
+      $errors = \DateTimeImmutable::getLastErrors();
+
+      if (
+        $hasil !== false &&
+        (
+          $errors === false ||
+          (
+            $errors['warning_count'] === 0 &&
+            $errors['error_count'] === 0
+          )
+        ) &&
+        $hasil->format($format) === $waktu
+      ) {
+        return $hasil->format('H:i:s');
+      }
+    }
+
+    throw new InvalidArgumentException('Waktu pengambilan tidak valid.');
+  }
+
+  /**
+   * Memastikan waktu pengambilan tidak kurang dari dua jam dari sekarang WIB.
+   */
+  private function validasiWaktuMulai(
+    string $tglMulai,
+    string $wktAmbil
   ): void {
+    $zonaWaktu = new \DateTimeZone('Asia/Jakarta');
+    $sekarangMinimum = (new \DateTimeImmutable('now', $zonaWaktu))
+      ->modify('+2 hours');
+
+    $waktuMulai = \DateTimeImmutable::createFromFormat(
+      '!Y-m-d H:i:s',
+      $tglMulai . ' ' . $this->normalisasiWaktu($wktAmbil),
+      $zonaWaktu
+    );
+
+    if ($waktuMulai === false || $waktuMulai < $sekarangMinimum) {
+      throw new InvalidArgumentException(
+        'Waktu pengambilan harus minimal dua jam dari sekarang (Asia/Jakarta).'
+      );
+    }
+  }
+
+  /**
+   * Memperoleh named lock MySQL pada koneksi yang sedang digunakan.
+   */
+  private function ambilKunci(string $namaKunci, int $timeout = 10): void
+  {
     $stmt = $this->db->prepare(
       'SELECT GET_LOCK(?, ?) AS lock_status'
     );
 
     if (!$stmt) {
-      throw new RuntimeException(
-        'Kunci proses gagal disiapkan.'
-      );
+      throw new RuntimeException('Named lock gagal disiapkan.');
     }
 
     $stmt->bind_param('si', $namaKunci, $timeout);
 
     if (!$stmt->execute()) {
       $stmt->close();
-
-      throw new RuntimeException(
-        'Kunci proses gagal dijalankan.'
-      );
+      throw new RuntimeException('Named lock gagal dijalankan.');
     }
 
-    $hasil = $stmt->get_result()->fetch_assoc();
+    $hasilKunci = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    if ((int) ($hasil['lock_status'] ?? 0) !== 1) {
+    if ((int) ($hasilKunci['lock_status'] ?? 0) !== 1) {
       throw new RuntimeException(
         'Kunci proses tidak diperoleh. Silakan coba lagi.'
       );
     }
   }
 
-  private function lepasKunci(string $namaKunci): void
+  /**
+   * Mengunci keranjang aktif berdasarkan penyewa agar satu penyewa tidak
+   * membuat beberapa keranjang aktif akibat permintaan bersamaan.
+   */
+  private function namaKunciKeranjang(string $userPlg): string
   {
-    $stmt = $this->db->prepare(
-      'SELECT RELEASE_LOCK(?)'
-    );
-
-    if (!$stmt) {
-      throw new RuntimeException(
-        'Pelepasan kunci proses gagal disiapkan.'
-      );
-    }
-
-    $stmt->bind_param('s', $namaKunci);
-    $berhasil = $stmt->execute();
-    $stmt->close();
-
-    if (!$berhasil) {
-      throw new RuntimeException(
-        'Pelepasan kunci proses gagal dijalankan.'
-      );
-    }
+    return 'dpwl_cart_' . substr(hash('sha256', $userPlg), 0, 48);
   }
 
+  /**
+   * Membuat kode INV/YYYYMMDD/NN.
+   * Named lock dipegang oleh pemanggil sampai transaksi berhasil commit.
+   */
   private function kunciDanBuatKodeSewa(): array
   {
-    $tanggal = (
-      new DateTimeImmutable(
-        'now',
-        new DateTimeZone('Asia/Jakarta')
-      )
-    )->format('Ymd');
-
-    $prefix = 'INV/' . $tanggal . '/';
-    $namaKunci = 'dpwl_inv_' . $tanggal;
+    $tanggalKode = (new \DateTimeImmutable('now', new \DateTimeZone('Asia/Jakarta')))->format('Ymd');
+    $prefix = 'INV/' . $tanggalKode . '/';
+    $namaKunci = 'dpwl_inv_' . $tanggalKode;
 
     $this->ambilKunci($namaKunci);
 
     try {
       $stmt = $this->db->prepare(
         "SELECT kode_sewa
-       FROM t_sewa
-       WHERE kode_sewa LIKE ?
-       ORDER BY kode_sewa DESC
-       LIMIT 1"
+         FROM t_sewa
+         WHERE kode_sewa LIKE ?
+         ORDER BY kode_sewa DESC
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
         throw new RuntimeException(
-          'Pencarian nomor transaksi gagal disiapkan.'
+          'Pencarian nomor transaksi terakhir gagal disiapkan.'
         );
       }
 
@@ -101,9 +185,8 @@ class Transaksi_model
 
       if (!$stmt->execute()) {
         $stmt->close();
-
         throw new RuntimeException(
-          'Pencarian nomor transaksi gagal dijalankan.'
+          'Pencarian nomor transaksi terakhir gagal dijalankan.'
         );
       }
 
@@ -131,62 +214,33 @@ class Transaksi_model
         ),
         'nama_kunci' => $namaKunci
       ];
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
       $this->lepasKunci($namaKunci);
       throw $e;
     }
   }
 
-  public function getJumlahMobilKeranjang(string $userPlg): int
+  private function lepasKunci(string $namaKunci): void
   {
-    $userPlg = trim($userPlg);
-
-    if ($userPlg === '') {
-      return 0;
-    }
-
     $stmt = $this->db->prepare(
-      "SELECT COUNT(*) AS jumlah
-      FROM t_pilih p
-      INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
-      WHERE s.user_plg = ?
-        AND s.status_sewa = 'keranjang'"
+      'SELECT RELEASE_LOCK(?) AS release_status'
     );
 
-    if (!$stmt) {
-      throw new RuntimeException(
-        'Penghitungan kendaraan dalam keranjang gagal disiapkan.'
-      );
-    }
-
-    $stmt->bind_param('s', $userPlg);
-
-    if (!$stmt->execute()) {
+    if ($stmt) {
+      $stmt->bind_param('s', $namaKunci);
+      $stmt->execute();
       $stmt->close();
-      throw new RuntimeException(
-        'Penghitungan kendaraan dalam keranjang gagal dijalankan.'
-      );
     }
-
-    $hasil = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    return (int) ($hasil['jumlah'] ?? 0);
-  }
-
-  private function namaKunciKeranjang(string $userPlg): string
-  {
-    return 'dpwl_cart_' . substr(hash('sha256', $userPlg), 0, 48);
   }
 
   private function kunciKendaraan(string $noPlat): array
   {
     $stmt = $this->db->prepare(
       "SELECT no_plat, hrg_hari, status_unit
-    FROM t_mobil
-    WHERE no_plat = ?
-    LIMIT 1
-    FOR UPDATE"
+       FROM t_mobil
+       WHERE no_plat = ?
+       LIMIT 1
+       FOR UPDATE"
     );
 
     if (!$stmt) {
@@ -199,9 +253,7 @@ class Transaksi_model
 
     if (!$stmt->execute()) {
       $stmt->close();
-      throw new RuntimeException(
-        'Penguncian kendaraan gagal dijalankan.'
-      );
+      throw new RuntimeException('Penguncian kendaraan gagal dijalankan.');
     }
 
     $kendaraan = $stmt->get_result()->fetch_assoc();
@@ -212,97 +264,6 @@ class Transaksi_model
     }
 
     return $kendaraan;
-  }
-
-  private function hitungHariSewa(
-    string $tglMulai,
-    string $tglSelesai
-  ): int {
-    $mulai = DateTimeImmutable::createFromFormat('!Y-m-d', $tglMulai);
-    $errorMulai = DateTimeImmutable::getLastErrors();
-
-    if (
-      $mulai === false ||
-      (
-        $errorMulai !== false &&
-        (
-          $errorMulai['warning_count'] > 0 ||
-          $errorMulai['error_count'] > 0
-        )
-      ) ||
-      $mulai->format('Y-m-d') !== $tglMulai
-    ) {
-      throw new InvalidArgumentException(
-        'Tanggal mulai tidak valid.'
-      );
-    }
-
-    $selesai = DateTimeImmutable::createFromFormat(
-      '!Y-m-d',
-      $tglSelesai
-    );
-    $errorSelesai = DateTimeImmutable::getLastErrors();
-
-    if (
-      $selesai === false ||
-      (
-        $errorSelesai !== false &&
-        (
-          $errorSelesai['warning_count'] > 0 ||
-          $errorSelesai['error_count'] > 0
-        )
-      ) ||
-      $selesai->format('Y-m-d') !== $tglSelesai
-    ) {
-      throw new InvalidArgumentException(
-        'Tanggal selesai tidak valid.'
-      );
-    }
-
-    if ($selesai <= $mulai) {
-      throw new InvalidArgumentException(
-        'Tanggal selesai harus setelah tanggal mulai.'
-      );
-    }
-
-    $hari = (int) $mulai->diff($selesai)->days;
-
-    if ($hari < 1 || $hari > 127) {
-      throw new InvalidArgumentException(
-        'Lama sewa harus antara 1 dan 127 hari.'
-      );
-    }
-
-    return $hari;
-  }
-
-  private function normalisasiWaktu(string $waktu): string
-  {
-    foreach (['H:i:s', 'H:i'] as $format) {
-      $hasil = DateTimeImmutable::createFromFormat(
-        '!' . $format,
-        $waktu
-      );
-      $errors = DateTimeImmutable::getLastErrors();
-
-      if (
-        $hasil !== false &&
-        (
-          $errors === false ||
-          (
-            $errors['warning_count'] === 0 &&
-            $errors['error_count'] === 0
-          )
-        ) &&
-        $hasil->format($format) === $waktu
-      ) {
-        return $hasil->format('H:i:s');
-      }
-    }
-
-    throw new InvalidArgumentException(
-      'Waktu pengambilan tidak valid.'
-    );
   }
 
   public function tambahKeKeranjang(
@@ -332,18 +293,19 @@ class Transaksi_model
         );
       }
 
+      // Kunci per penyewa: satu keranjang aktif dipakai bersama untuk semua kendaraan.
       $namaKunciKeranjang = $this->namaKunciKeranjang($userPlg);
       $this->ambilKunci($namaKunciKeranjang);
       $kunciKeranjangDidapat = true;
 
       $stmt = $this->db->prepare(
         "SELECT kode_sewa, tgl_mulai, tgl_selesai, wkt_ambil
-      FROM t_sewa
-      WHERE user_plg = ?
-        AND status_sewa = 'keranjang'
-      ORDER BY kode_sewa ASC
-      LIMIT 1
-      FOR UPDATE"
+         FROM t_sewa
+         WHERE user_plg = ?
+           AND status_sewa = 'keranjang'
+         ORDER BY kode_sewa ASC
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -365,17 +327,19 @@ class Transaksi_model
       $stmt->close();
 
       if ($keranjang !== null) {
+        // Pertahankan periode dan waktu yang sudah dipilih pada keranjang aktif.
         $kodeSewa = (string) $keranjang['kode_sewa'];
         $tglMulai = (string) $keranjang['tgl_mulai'];
         $tglSelesai = (string) $keranjang['tgl_selesai'];
-        $wktAmbil = $this->normalisasiWaktu(
-          (string) $keranjang['wkt_ambil']
-        );
+        $wktAmbil = $this->normalisasiWaktu((string) $keranjang['wkt_ambil']);
       } else {
-        $sekarang = new DateTimeImmutable('now');
-        $tglMulai = $sekarang->format('Y-m-d');
-        $tglSelesai = $sekarang->modify('+1 day')->format('Y-m-d');
-        $wktAmbil = $sekarang->format('H:i:s');
+        // Keranjang baru dimulai minimal dua jam dari waktu sekarang WIB.
+        $zonaWaktu = new \DateTimeZone('Asia/Jakarta');
+        $mulaiDefault = (new \DateTimeImmutable('now', $zonaWaktu))->modify('+2 hours');
+        $tglMulai = $mulaiDefault->format('Y-m-d');
+        $tglSelesai = $mulaiDefault->modify('+1 day')->format('Y-m-d');
+        $wktAmbil = $mulaiDefault->format('H:i:s');
+        $kodeSewa = '';
 
         $dataKode = $this->kunciDanBuatKodeSewa();
         $kodeSewa = $dataKode['kode_sewa'];
@@ -383,13 +347,13 @@ class Transaksi_model
 
         $stmt = $this->db->prepare(
           "INSERT INTO t_sewa (
-        kode_sewa,
-        tgl_mulai,
-        tgl_selesai,
-        wkt_ambil,
-        status_sewa,
-        user_plg
-      ) VALUES (?, ?, ?, ?, 'keranjang', ?)"
+            kode_sewa,
+            tgl_mulai,
+            tgl_selesai,
+            wkt_ambil,
+            status_sewa,
+            user_plg
+          ) VALUES (?, ?, ?, ?, 'keranjang', ?)"
         );
 
         if (!$stmt) {
@@ -409,22 +373,21 @@ class Transaksi_model
 
         if (!$stmt->execute()) {
           $stmt->close();
-          throw new RuntimeException(
-            'Transaksi keranjang gagal dibuat.'
-          );
+          throw new RuntimeException('Transaksi keranjang gagal dibuat.');
         }
 
         $stmt->close();
       }
 
       // Cegah kendaraan yang sama dimasukkan dua kali ke keranjang aktif.
+      // Pemeriksaan eksplisit ini tidak bergantung pada UNIQUE constraint di database.
       $stmt = $this->db->prepare(
         "SELECT 1
-        FROM t_pilih
-        WHERE kode_sewa = ?
-          AND no_plat = ?
-        LIMIT 1
-        FOR UPDATE"
+         FROM t_pilih
+         WHERE kode_sewa = ?
+           AND no_plat = ?
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -437,15 +400,12 @@ class Transaksi_model
 
       if (!$stmt->execute()) {
         $stmt->close();
-
         throw new RuntimeException(
           'Pemeriksaan kendaraan dalam keranjang gagal dijalankan.'
         );
       }
 
-      $kendaraanSudahDipilih =
-        $stmt->get_result()->fetch_assoc() !== null;
-
+      $kendaraanSudahDipilih = $stmt->get_result()->fetch_assoc() !== null;
       $stmt->close();
 
       if ($kendaraanSudahDipilih) {
@@ -454,15 +414,16 @@ class Transaksi_model
         );
       }
 
+      // Durasi detail mengikuti periode header keranjang yang dipakai.
       $hari = $this->hitungHariSewa($tglMulai, $tglSelesai);
 
       $stmt = $this->db->prepare(
         "INSERT INTO t_pilih (
-      kode_sewa,
-      no_plat,
-      hrg_sewa,
-      n_hari
-    ) VALUES (?, ?, ?, ?)"
+          kode_sewa,
+          no_plat,
+          hrg_sewa,
+          n_hari
+        ) VALUES (?, ?, ?, ?)"
       );
 
       if (!$stmt) {
@@ -472,13 +433,7 @@ class Transaksi_model
       }
 
       $harga = (int) $kendaraan['hrg_hari'];
-      $stmt->bind_param(
-        'ssii',
-        $kodeSewa,
-        $noPlat,
-        $harga,
-        $hari
-      );
+      $stmt->bind_param('ssii', $kodeSewa, $noPlat, $harga, $hari);
 
       if (!$stmt->execute()) {
         $errno = $stmt->errno;
@@ -509,7 +464,7 @@ class Transaksi_model
       }
 
       return $kodeSewa;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
       $this->db->rollback();
 
       if ($namaKunci !== null) {
@@ -524,27 +479,9 @@ class Transaksi_model
     }
   }
 
-  private function validasiWaktuMulai(
-    string $tglMulai,
-    string $wktAmbil
-  ): void {
-    $zonaWaktu = new \DateTimeZone('Asia/Jakarta');
-    $sekarangMinimum = (new \DateTimeImmutable('now', $zonaWaktu))
-      ->modify('+2 hours');
-
-    $waktuMulai = \DateTimeImmutable::createFromFormat(
-      '!Y-m-d H:i:s',
-      $tglMulai . ' ' . $this->normalisasiWaktu($wktAmbil),
-      $zonaWaktu
-    );
-
-    if ($waktuMulai === false || $waktuMulai < $sekarangMinimum) {
-      throw new InvalidArgumentException(
-        'Waktu pengambilan harus minimal dua jam dari sekarang (Asia/Jakarta).'
-      );
-    }
-  }
-
+  /**
+   * Memperbarui periode header keranjang dan durasi semua detailnya secara atomik.
+   */
   public function perbaruiPeriodeKeranjang(
     string $kodeSewa,
     string $userPlg,
@@ -570,12 +507,12 @@ class Transaksi_model
     try {
       $stmt = $this->db->prepare(
         "SELECT kode_sewa
-        FROM t_sewa
-        WHERE kode_sewa = ?
-          AND user_plg = ?
-          AND status_sewa = 'keranjang'
-        LIMIT 1
-        FOR UPDATE"
+         FROM t_sewa
+         WHERE kode_sewa = ?
+           AND user_plg = ?
+           AND status_sewa = 'keranjang'
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -604,10 +541,10 @@ class Transaksi_model
 
       $stmt = $this->db->prepare(
         "UPDATE t_sewa
-        SET tgl_mulai = ?, tgl_selesai = ?, wkt_ambil = ?
-        WHERE kode_sewa = ?
-          AND user_plg = ?
-          AND status_sewa = 'keranjang'"
+         SET tgl_mulai = ?, tgl_selesai = ?, wkt_ambil = ?
+         WHERE kode_sewa = ?
+           AND user_plg = ?
+           AND status_sewa = 'keranjang'"
       );
 
       if (!$stmt) {
@@ -669,17 +606,17 @@ class Transaksi_model
   ): ?array {
     $stmt = $this->db->prepare(
       "SELECT
-        kode_sewa,
-        tgl_mulai,
-        tgl_selesai,
-        wkt_ambil,
-        status_sewa,
-        user_plg
-      FROM t_sewa
-      WHERE kode_sewa = ?
-        AND user_plg = ?
-        AND status_sewa = 'keranjang'
-      LIMIT 1"
+         kode_sewa,
+         tgl_mulai,
+         tgl_selesai,
+         wkt_ambil,
+         status_sewa,
+         user_plg
+       FROM t_sewa
+       WHERE kode_sewa = ?
+         AND user_plg = ?
+         AND status_sewa = 'keranjang'
+       LIMIT 1"
     );
 
     if (!$stmt) {
@@ -706,17 +643,17 @@ class Transaksi_model
 
     $stmt = $this->db->prepare(
       "SELECT
-        p.kode_sewa,
-        p.no_plat,
-        p.hrg_sewa,
-        p.n_hari,
-        m.nm_mobil,
-        m.ft_depan,
-        m.status_unit
-      FROM t_pilih p
-      INNER JOIN t_mobil m ON m.no_plat = p.no_plat
-      WHERE p.kode_sewa = ?
-      ORDER BY m.nm_mobil ASC"
+         p.kode_sewa,
+         p.no_plat,
+         p.hrg_sewa,
+         p.n_hari,
+         m.nm_mobil,
+         m.ft_depan,
+         m.status_unit
+       FROM t_pilih p
+       INNER JOIN t_mobil m ON m.no_plat = p.no_plat
+       WHERE p.kode_sewa = ?
+       ORDER BY m.nm_mobil ASC"
     );
 
     if (!$stmt) {
@@ -754,12 +691,12 @@ class Transaksi_model
   ): bool {
     $stmt = $this->db->prepare(
       "DELETE p
-      FROM t_pilih p
-      INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
-      WHERE p.kode_sewa = ?
-        AND p.no_plat = ?
-        AND s.user_plg = ?
-        AND s.status_sewa = 'keranjang'"
+       FROM t_pilih p
+       INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
+       WHERE p.kode_sewa = ?
+         AND p.no_plat = ?
+         AND s.user_plg = ?
+         AND s.status_sewa = 'keranjang'"
     );
 
     if (!$stmt) {
@@ -793,15 +730,15 @@ class Transaksi_model
       // Baca awal header tanpa mengunci baris.
       $stmt = $this->db->prepare(
         "SELECT
-          kode_sewa,
-          tgl_mulai,
-          tgl_selesai,
-          wkt_ambil,
-          status_sewa
-        FROM t_sewa
-        WHERE kode_sewa = ?
-          AND user_plg = ?
-        LIMIT 1"
+           kode_sewa,
+           tgl_mulai,
+           tgl_selesai,
+           wkt_ambil,
+           status_sewa
+         FROM t_sewa
+         WHERE kode_sewa = ?
+           AND user_plg = ?
+         LIMIT 1"
       );
 
       if (!$stmt) {
@@ -840,9 +777,9 @@ class Transaksi_model
       // Ambil daftar kendaraan dan urutkan sebelum menguncinya.
       $stmt = $this->db->prepare(
         "SELECT no_plat
-        FROM t_pilih
-        WHERE kode_sewa = ?
-        ORDER BY no_plat ASC"
+         FROM t_pilih
+         WHERE kode_sewa = ?
+         ORDER BY no_plat ASC"
       );
 
       if (!$stmt) {
@@ -882,16 +819,16 @@ class Transaksi_model
       // Setelah kendaraan terkunci, kunci ulang header.
       $stmt = $this->db->prepare(
         "SELECT
-          kode_sewa,
-          tgl_mulai,
-          tgl_selesai,
-          wkt_ambil,
-          status_sewa
-        FROM t_sewa
-        WHERE kode_sewa = ?
-          AND user_plg = ?
-        LIMIT 1
-        FOR UPDATE"
+           kode_sewa,
+           tgl_mulai,
+           tgl_selesai,
+           wkt_ambil,
+           status_sewa
+         FROM t_sewa
+         WHERE kode_sewa = ?
+           AND user_plg = ?
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -927,15 +864,15 @@ class Transaksi_model
       // Baca ulang detail setelah header dikunci.
       $stmt = $this->db->prepare(
         "SELECT
-          p.no_plat,
-          p.hrg_sewa,
-          p.n_hari,
-          m.status_unit
-        FROM t_pilih p
-        INNER JOIN t_mobil m ON m.no_plat = p.no_plat
-        WHERE p.kode_sewa = ?
-        ORDER BY p.no_plat ASC
-        FOR UPDATE"
+           p.no_plat,
+           p.hrg_sewa,
+           p.n_hari,
+           m.status_unit
+         FROM t_pilih p
+         INNER JOIN t_mobil m ON m.no_plat = p.no_plat
+         WHERE p.kode_sewa = ?
+         ORDER BY p.no_plat ASC
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -989,7 +926,7 @@ class Transaksi_model
       // Buat record pembayaran DP dalam transaksi database yang sama.
       $hasilTanggal = $this->db->query(
         "SELECT DATE_FORMAT(NOW(), '%Y%m%d') AS tanggal_kode,
-              NOW() AS waktu_konfirmasi"
+                NOW() AS waktu_konfirmasi"
       );
 
       if (!$hasilTanggal) {
@@ -1012,10 +949,10 @@ class Transaksi_model
       // Pastikan transaksi ini belum memiliki record DP.
       $stmt = $this->db->prepare(
         "SELECT kode_bayar
-        FROM t_bayar
-        WHERE kode_sewa = ? AND jns_byr = 'dp'
-        LIMIT 1
-        FOR UPDATE"
+         FROM t_bayar
+         WHERE kode_sewa = ? AND jns_byr = 'dp'
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -1040,11 +977,11 @@ class Transaksi_model
       $polaKodeBayar = 'PAY/' . $tanggalKode . '/%';
       $stmt = $this->db->prepare(
         "SELECT kode_bayar
-        FROM t_bayar
-        WHERE kode_bayar LIKE ?
-        ORDER BY kode_bayar DESC
-        LIMIT 1
-        FOR UPDATE"
+         FROM t_bayar
+         WHERE kode_bayar LIKE ?
+         ORDER BY kode_bayar DESC
+         LIMIT 1
+         FOR UPDATE"
       );
 
       if (!$stmt) {
@@ -1086,9 +1023,9 @@ class Transaksi_model
 
       $stmt = $this->db->prepare(
         "INSERT INTO t_bayar
-        (kode_bayar, tgl_wkt_byr, ft_byr, mtode_byr, jns_byr,
-          nominal, sttus_byr, tgl_wkt_ver, kode_sewa)
-        VALUES (?, ?, NULL, 'transfer', 'dp', ?, 'pending', NULL, ?)"
+          (kode_bayar, tgl_wkt_byr, ft_byr, mtode_byr, jns_byr,
+           nominal, sttus_byr, tgl_wkt_ver, kode_sewa)
+         VALUES (?, ?, NULL, 'transfer', 'dp', ?, 'pending', NULL, ?)"
       );
 
       if (!$stmt) {
@@ -1106,10 +1043,10 @@ class Transaksi_model
 
       $stmt = $this->db->prepare(
         "UPDATE t_sewa
-        SET status_sewa = 'diajukan'
-        WHERE kode_sewa = ?
-          AND user_plg = ?
-          AND status_sewa = 'keranjang'"
+         SET status_sewa = 'diajukan'
+         WHERE kode_sewa = ?
+           AND user_plg = ?
+           AND status_sewa = 'keranjang'"
       );
 
       if (!$stmt) {
@@ -1143,6 +1080,50 @@ class Transaksi_model
     }
   }
 
+  /**
+   * Menghitung jumlah kendaraan pada keranjang aktif milik penyewa.
+   * Satu baris t_pilih dihitung sebagai satu kendaraan.
+   */
+  public function getJumlahMobilKeranjang(string $userPlg): int
+  {
+    $userPlg = trim($userPlg);
+
+    if ($userPlg === '') {
+      return 0;
+    }
+
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*) AS jumlah
+       FROM t_pilih p
+       INNER JOIN t_sewa s ON s.kode_sewa = p.kode_sewa
+       WHERE s.user_plg = ?
+         AND s.status_sewa = 'keranjang'"
+    );
+
+    if (!$stmt) {
+      throw new RuntimeException(
+        'Penghitungan kendaraan dalam keranjang gagal disiapkan.'
+      );
+    }
+
+    $stmt->bind_param('s', $userPlg);
+
+    if (!$stmt->execute()) {
+      $stmt->close();
+      throw new RuntimeException(
+        'Penghitungan kendaraan dalam keranjang gagal dijalankan.'
+      );
+    }
+
+    $hasil = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    return (int) ($hasil['jumlah'] ?? 0);
+  }
+
+  /**
+   * Mengambil kode transaksi keranjang aktif milik penyewa.
+   */
   public function getKodeKeranjangAktif(string $userPlg): ?string
   {
     $userPlg = trim($userPlg);
@@ -1153,11 +1134,11 @@ class Transaksi_model
 
     $stmt = $this->db->prepare(
       "SELECT kode_sewa
-      FROM t_sewa
-      WHERE user_plg = ?
-        AND status_sewa = 'keranjang'
-      ORDER BY kode_sewa ASC
-      LIMIT 1"
+        FROM t_sewa
+        WHERE user_plg = ?
+          AND status_sewa = 'keranjang'
+        ORDER BY kode_sewa ASC
+        LIMIT 1"
     );
 
     if (!$stmt) {

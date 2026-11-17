@@ -11,6 +11,10 @@ class Transaksi_controller extends Controller
     $this->transaksiModel = new Transaksi_model();
   }
 
+  /**
+   * Menambahkan kendaraan ke keranjang penyewa yang sedang login.
+   * Periode dan waktu awal ditentukan oleh model; tidak diterima dari formulir.
+   */
   public function tambah(): void
   {
     $userPlg = $this->wajibLoginPenyewa();
@@ -30,10 +34,7 @@ class Transaksi_controller extends Controller
     }
 
     try {
-      $this->transaksiModel->tambahKeKeranjang(
-        $userPlg,
-        $noPlat
-      );
+      $this->transaksiModel->tambahKeKeranjang($userPlg, $noPlat);
 
       $this->redirectTambahDenganPesan(
         $asal,
@@ -49,9 +50,7 @@ class Transaksi_controller extends Controller
         $e->getMessage()
       );
     } catch (Throwable $e) {
-      error_log(
-        'Tambah keranjang gagal: ' . $e->getMessage()
-      );
+      error_log('Tambah keranjang gagal: ' . $e->getMessage());
 
       $this->redirectTambahDenganPesan(
         $asal,
@@ -62,72 +61,7 @@ class Transaksi_controller extends Controller
     }
   }
 
-  private function wajibLoginPenyewa(): string
-  {
-    $userPlg = trim(
-      (string) ($_SESSION['penyewa_user_plg'] ?? '')
-    );
-
-    if ($userPlg === '') {
-      $_SESSION['flash_penyewa_nav'] =
-        'Silakan login terlebih dahulu untuk mengakses transaksi.';
-
-      header('Location: ' . site_url('auth/login-penyewa'));
-      exit;
-    }
-
-    return $userPlg;
-  }
-
-  private function wajibMetode(string $metodeDiizinkan): void
-  {
-    $metodeAktif = strtoupper(
-      (string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')
-    );
-
-    if ($metodeAktif !== $metodeDiizinkan) {
-      http_response_code(405);
-      header('Allow: ' . $metodeDiizinkan);
-      exit('Method Not Allowed');
-    }
-  }
-
-  private function redirectTambahDenganPesan(
-    string $asal,
-    string $noPlat,
-    string $jenis,
-    string $pesan
-  ): never {
-    $_SESSION['flash_transaksi'] = [
-      'type' => $jenis,
-      'message' => $pesan
-    ];
-
-    if ($asal === 'detail' && $noPlat !== '') {
-      $uri = 'katalog/detail/' . rawurlencode($noPlat);
-    } else {
-      $uri = 'katalog';
-    }
-
-    header('Location: ' . site_url($uri));
-    exit;
-  }
-
-  private function pesanBisnisAman(string $pesan): string
-  {
-    $pesanDikenal = [
-      'Kendaraan tidak berstatus tersedia.',
-      'Kendaraan sudah ada dalam keranjang ini.',
-      'Kendaraan tidak ditemukan.',
-      'Nomor transaksi harian telah mencapai batas 99.',
-      'Kunci proses tidak diperoleh. Silakan coba lagi.'
-    ];
-
-    return in_array($pesan, $pesanDikenal, true)
-      ? $pesan
-      : 'Permintaan transaksi belum berhasil. Periksa data dan coba kembali.';
-  }
-
+  /** Menampilkan keranjang milik penyewa yang sedang login. */
   public function keranjang(string $kodeSewa = ''): void
   {
     $userPlg = $this->wajibLoginPenyewa();
@@ -141,7 +75,7 @@ class Transaksi_controller extends Controller
           ->getKodeKeranjangAktif($userPlg);
 
         if ($kodeSewa === null || $kodeSewa === '') {
-          $_SESSION['flash_transaksi'] = [
+          $_SESSION['flash_penyewa_nav'] = [
             'type' => 'info',
             'message' => 'Keranjang Anda masih kosong.'
           ];
@@ -167,8 +101,8 @@ class Transaksi_controller extends Controller
         exit('Keranjang tidak ditemukan atau bukan milik akun ini.');
       }
 
-      $flash = $_SESSION['flash_transaksi'] ?? null;
-      unset($_SESSION['flash_transaksi']);
+      $flash = $_SESSION['flash_penyewa_nav'] ?? null;
+      unset($_SESSION['flash_penyewa_nav']);
 
       $this->view('transaksi/keranjang', [
         'keranjang' => $keranjang,
@@ -182,6 +116,7 @@ class Transaksi_controller extends Controller
     }
   }
 
+  /** Memperbarui periode dan waktu pengambilan keranjang sebelum checkout. */
   public function perbaruiPeriode(): void
   {
     $userPlg = $this->wajibLoginPenyewa();
@@ -228,6 +163,7 @@ class Transaksi_controller extends Controller
     }
   }
 
+  /** Menghapus satu kendaraan dari keranjang yang masih berstatus keranjang. */
   public function hapus(): void
   {
     $userPlg = $this->wajibLoginPenyewa();
@@ -266,6 +202,10 @@ class Transaksi_controller extends Controller
     }
   }
 
+  /**
+   * GET: menampilkan ringkasan konfirmasi checkout.
+   * POST: memvalidasi ulang dan mengajukan transaksi.
+   */
   public function checkout(): void
   {
     $userPlg = $this->wajibLoginPenyewa();
@@ -339,8 +279,10 @@ class Transaksi_controller extends Controller
         );
       }
 
-      $_SESSION['flash_penyewa_nav'] =
-        'Checkout berhasil. Transaksi diajukan dan menunggu persetujuan admin.';
+      $_SESSION['flash_penyewa_nav'] = [
+        'type' => 'success',
+        'message' => 'Checkout berhasil. Transaksi diajukan dan menunggu persetujuan admin.'
+      ];
       header('Location: ' . site_url('katalog'));
       exit;
     } catch (Throwable $e) {
@@ -354,17 +296,87 @@ class Transaksi_controller extends Controller
     }
   }
 
+  private function wajibLoginPenyewa(): string
+  {
+    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
+
+    if ($userPlg === '') {
+      $_SESSION['flash_penyewa_nav'] = [
+        'type' => 'info',
+        'message' => 'Silakan login terlebih dahulu untuk mengakses transaksi.'
+      ];
+      header('Location: ' . site_url('auth/login-penyewa'));
+      exit;
+    }
+
+    return $userPlg;
+  }
+
+  private function wajibMetode(string $metodeDiizinkan, string ...$metodeTambahan): void
+  {
+    $diizinkan = [$metodeDiizinkan, ...$metodeTambahan];
+    $metodeAktif = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+
+    if (!in_array($metodeAktif, $diizinkan, true)) {
+      http_response_code(405);
+      header('Allow: ' . implode(', ', $diizinkan));
+      exit('Method Not Allowed');
+    }
+  }
+
+  private function redirectTambahDenganPesan(
+    string $asal,
+    string $noPlat,
+    string $jenis,
+    string $pesan
+  ): never {
+    $_SESSION['flash_penyewa_nav'] = [
+      'type' => $jenis,
+      'message' => $pesan
+    ];
+
+    if ($asal === 'detail' && $noPlat !== '') {
+      header('Location: ' . site_url('katalog/detail/' . rawurlencode($noPlat)));
+      exit;
+    }
+
+    header('Location: ' . site_url('katalog'));
+    exit;
+  }
+
   private function redirectDenganPesan(
     string $uri,
     string $jenis,
     string $pesan
   ): never {
-    $_SESSION['flash_transaksi'] = [
+    $_SESSION['flash_penyewa_nav'] = [
       'type' => $jenis,
       'message' => $pesan
     ];
 
     header('Location: ' . site_url($uri));
     exit;
+  }
+
+  private function pesanBisnisAman(string $pesan): string
+  {
+    $pesanDikenal = [
+      'Kendaraan tidak berstatus tersedia.',
+      'Kendaraan sudah ada dalam keranjang ini.',
+      'Kendaraan tidak ditemukan.',
+      'Keranjang tidak ditemukan atau statusnya tidak valid.',
+      'Nomor transaksi harian telah mencapai batas 99.',
+      'Kunci proses tidak diperoleh. Silakan coba lagi.',
+      'Tanggal mulai tidak valid.',
+      'Tanggal selesai tidak valid.',
+      'Tanggal selesai harus setelah tanggal mulai.',
+      'Lama sewa harus antara 1 dan 127 hari.',
+      'Waktu pengambilan tidak valid.',
+      'Waktu pengambilan harus minimal dua jam dari sekarang (Asia/Jakarta).'
+    ];
+
+    return in_array($pesan, $pesanDikenal, true)
+      ? $pesan
+      : 'Permintaan transaksi belum berhasil. Periksa data dan coba kembali.';
   }
 }

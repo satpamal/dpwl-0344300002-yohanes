@@ -40,3 +40,12 @@ $route['transaksi/perbarui-periode'] = 'Transaksi_controller/perbaruiPeriode';
 $route['transaksi/hapus'] = 'Transaksi_controller/hapus';
 $route['transaksi/hapus/(:any)'] = 'Transaksi_controller/hapus/$1';
 $route['transaksi/checkout'] = 'Transaksi_controller/checkout';
+
+// Route P9 - Pembayaran DP dan verifikasi admin.
+$route['pembayaran'] = 'Pembayaran_controller/index';
+$route['pembayaran/detail/(:any)'] = 'Pembayaran_controller/detail/$1';
+$route['pembayaran/upload/(:any)'] = 'Pembayaran_controller/uploadBukti/$1';
+
+$route['admin/pembayaran'] = 'Pembayaran_controller/verifikasiIndex';
+$route['admin/pembayaran/verifikasi/(:any)'] = 'Pembayaran_controller/verifikasiDetail/$1';
+$route['admin/pembayaran/proses/(:any)'] = 'Pembayaran_controller/prosesVerifikasi/$1';

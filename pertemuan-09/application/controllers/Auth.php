@@ -263,8 +263,10 @@ class Auth extends Controller
       session_regenerate_id(true);
 
       $_SESSION['penyewa_user_plg'] = $penyewa['user_plg'];
-      $_SESSION['flash_penyewa_nav'] =
-        'Login berhasil. Selamat datang, ' . $penyewa['nm_lngkp'] . '!';
+      $_SESSION['flash_penyewa_nav'] = [
+        'type' => 'success',
+        'message' => 'Login berhasil. Selamat datang, ' . $penyewa['nm_lngkp'] . '!'
+      ];
 
       header('Location: ' . site_url('katalog'));
       exit;
@@ -290,8 +292,10 @@ class Auth extends Controller
 
     session_regenerate_id(true);
 
-    $_SESSION['flash_penyewa_nav'] =
-      'Anda telah logout dari akun penyewa.';
+    $_SESSION['flash_penyewa_nav'] = [
+      'type' => 'info',
+      'message' => 'Anda telah logout dari akun penyewa.'
+    ];
 
     header('Location: ' . site_url('katalog'));
     exit;

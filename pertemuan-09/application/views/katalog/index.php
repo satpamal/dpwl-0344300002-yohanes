@@ -254,28 +254,12 @@
 
                 <?php if ($mobil['status_unit'] === 'tersedia'): ?>
                   <?php if (!empty($_SESSION['penyewa_user_plg'])): ?>
-                    <form
-                      action="<?= htmlspecialchars(
-                                site_url('transaksi/tambah'),
-                                ENT_QUOTES,
-                                'UTF-8'
-                              ) ?>"
-                      method="POST">
-
+                    <form action="<?= htmlspecialchars(site_url('transaksi/tambah'), ENT_QUOTES, 'UTF-8') ?>" method="POST">
                       <input
                         type="hidden"
                         name="no_plat"
-                        value="<?= htmlspecialchars(
-                                  (string) $mobil['no_plat'],
-                                  ENT_QUOTES,
-                                  'UTF-8'
-                                ) ?>">
-
-                      <input
-                        type="hidden"
-                        name="return_to"
-                        value="katalog">
-
+                        value="<?= htmlspecialchars((string) $mobil['no_plat'], ENT_QUOTES, 'UTF-8') ?>">
+                      <input type="hidden" name="return_to" value="katalog">
                       <button type="submit" class="btn btn-success w-100">
                         Tambah ke Keranjang
                       </button>

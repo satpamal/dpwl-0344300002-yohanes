@@ -16,8 +16,10 @@ class Penyewa_controller extends Controller
   public function profil(): void
   {
     if (empty($_SESSION['penyewa_user_plg'])) {
-      $_SESSION['flash_penyewa_nav'] =
-        'Silakan login terlebih dahulu untuk mengakses profil.';
+      $_SESSION['flash_penyewa_nav'] = [
+        'type' => 'info',
+        'message' => 'Silakan login terlebih dahulu untuk mengakses profil.'
+      ];
 
       header('Location: ' . site_url('auth/login-penyewa'));
       exit;
@@ -32,8 +34,10 @@ class Penyewa_controller extends Controller
         if ($profil === null) {
           unset($_SESSION['penyewa_user_plg']);
 
-          $_SESSION['flash_penyewa_nav'] =
-            'Data akun tidak ditemukan. Silakan login kembali.';
+          $_SESSION['flash_penyewa_nav'] = [
+            'type' => 'danger',
+            'message' => 'Data akun tidak ditemukan. Silakan login kembali.'
+          ];
 
           header('Location: ' . site_url('auth/login-penyewa'));
           exit;
@@ -42,14 +46,12 @@ class Penyewa_controller extends Controller
         $flash = $_SESSION['flash_profil_penyewa'] ?? null;
         unset($_SESSION['flash_profil_penyewa']);
 
-        $jumlahKeranjang = $this->transaksiModel->getJumlahMobilKeranjang($userPlg);
-
         $this->view('penyewa/profil', [
           'profil' => $profil,
           'flash' => $flash,
           'error' => null,
           'old' => [],
-          'jumlahKeranjang' => $jumlahKeranjang
+          'jumlahKeranjang' => $this->jumlahKeranjangAktif()
         ]);
 
         return;
@@ -92,8 +94,10 @@ class Penyewa_controller extends Controller
       if ($profil === null) {
         unset($_SESSION['penyewa_user_plg']);
 
-        $_SESSION['flash_penyewa_nav'] =
-          'Data akun tidak ditemukan. Silakan login kembali.';
+        $_SESSION['flash_penyewa_nav'] = [
+          'type' => 'danger',
+          'message' => 'Keranjang Anda masih kosong.'
+        ];
 
         header('Location: ' . site_url('auth/login-penyewa'));
         exit;
@@ -138,15 +142,13 @@ class Penyewa_controller extends Controller
         }
       }
 
-      $jumlahKeranjang = $this->transaksiModel->getJumlahMobilKeranjang($userPlg);
-
       if ($error !== null) {
         $this->view('penyewa/profil', [
           'profil' => $profil,
           'flash' => null,
           'error' => $error,
           'old' => $old,
-          'jumlahKeranjang' => $jumlahKeranjang
+          'jumlahKeranjang' => $this->jumlahKeranjangAktif()
         ]);
 
         return;
@@ -260,6 +262,20 @@ class Penyewa_controller extends Controller
     }
   }
 
+  /**
+   * Menghitung kendaraan pada keranjang aktif untuk navbar halaman profil.
+   */
+  private function jumlahKeranjangAktif(): int
+  {
+    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
+
+    if ($userPlg === '') {
+      return 0;
+    }
+
+    return $this->transaksiModel->getJumlahMobilKeranjang($userPlg);
+  }
+
   private function validateProfilInput(
     string $nik,
     string $nama,
@@ -306,17 +322,12 @@ class Penyewa_controller extends Controller
     array $old,
     string $error
   ): void {
-    $userPlg = trim((string) ($_SESSION['penyewa_user_plg'] ?? ''));
-    $jumlahKeranjang = $userPlg === ''
-      ? 0
-      : $this->transaksiModel->getJumlahMobilKeranjang($userPlg);
-
     $this->view('penyewa/profil', [
       'profil' => $profil,
       'flash' => null,
       'error' => $error,
       'old' => $old,
-      'jumlahKeranjang' => $jumlahKeranjang
+      'jumlahKeranjang' => $this->jumlahKeranjangAktif()
     ]);
   }
 

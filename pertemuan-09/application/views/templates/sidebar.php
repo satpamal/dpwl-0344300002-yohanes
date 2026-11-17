@@ -55,6 +55,11 @@ search"></i>
 <i class="fa fa-car"></i> <span>Manajemen Kendaraan</span>
 </a>
 </li>
+<li>
+<a href="<?= htmlspecialchars(site_url('admin/pembayaran'), ENT_QUOTES, 'UTF-8') ?>">
+<i class="fa fa-money"></i> <span>Verifikasi Pembayaran</span>
+</a>
+</li>
 
 </ul>
 <!-- /.sidebar-menu -->
