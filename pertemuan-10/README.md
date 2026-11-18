@@ -10,4 +10,4 @@ pada P10, saya mengembangkan, menguji:
 6. saya juga memeriksa proses verifikasi pembayaran DP oleh admin yang masih berfungsi dengan baik.
 7. selain itu, saat mencoba melakukan verifikasi pembayaran dp, fiturnya masih berfungsi.
 8. saya mengecek informasi kendaraan pada detail transaksi yang pembayaran dp nya sudah diverifikasi dengan hasil pengujian informasi tersebut tetap dapat ditampilkan.
-9.
+9. saya melakukan perubahan struktur pada tabel t_sewa, kolom status_sewa dengan menambahkan nilai 'lunas' pada ENUM.
