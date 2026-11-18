@@ -16,3 +16,9 @@ pada P10, saya mengembangkan, menguji:
 12. menambahkan method buatKodeBayarPelunasan(string $tanggalKode) di application\models\Pembayaran_model.php untuk membuat kode pembayaran pelunasan.
 13. menambahkan method simpanPelunasan() di application\models\Pembayaran_model.php untuk menghitung sisa kewajiban dan memvalidasi pelunasan.
 14. menguji model pelunasan dengan pemeriksaan terhadap method yang telah dibuat.
+15. Menampilkan daftar transaksi yang masih memiliki kewajiban pelunasan dengan method pelunasanIndex() di file application\controllers\Pembayaran_controller.php.
+16. menampilkan detail transaksi, riwayat pembayaran, dan sisa kewajiban dengan method pelunasanDetail(string $kodeSewa) di application\controllers\Pembayaran_controller.php.
+17. mencatat pembayaran pelunasan yang diterima langsung oleh admin dengan menambahkan method prosesPelunasan(string $kodeSewa) di application\controllers\Pembayaran_controller.php
+18. menampilkan dokumen transaksi yang siap dicetak dengan method dokumenTransaksi(string $kodeSewa) di application\controllers\Pembayaran_controller.php.
+19. melakukan pemeriksaan awal terhadap Controller Pembayaran (application\controllers\Pembayaran_controller.php).
+20.
