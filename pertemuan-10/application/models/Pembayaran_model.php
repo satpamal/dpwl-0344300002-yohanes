@@ -985,7 +985,7 @@ class Pembayaran_model
     FROM t_sewa s
     INNER JOIN t_penyewa p
       ON p.user_plg = s.user_plg
-    WHERE s.status_sewa IN ('disetujui')
+    WHERE s.status_sewa IN ('disetujui', 'lunas')
       AND EXISTS (
         SELECT 1
         FROM t_pilih tp
@@ -1020,9 +1020,16 @@ class Pembayaran_model
     }
     unset($item);
 
-    return array_values(array_filter(
+    /* return array_values(array_filter(
       $daftar,
       static fn(array $item): bool => $item['sisa_kewajiban'] > 0
+    )); */
+
+    return array_values(array_filter(
+      $daftar,
+      static fn(array $item): bool =>
+      $item['sisa_kewajiban'] > 0 ||
+        $item['status_sewa'] === 'lunas'
     ));
   }
 
@@ -1350,7 +1357,7 @@ class Pembayaran_model
 
       if (!in_array(
         $transaksi['status_sewa'],
-        ['disetujui', 'aktif'],
+        ['disetujui', 'lunas'],
         true
       )) {
         throw new RuntimeException(
@@ -1482,7 +1489,7 @@ class Pembayaran_model
         "UPDATE t_sewa
         SET status_sewa = 'lunas'
         WHERE kode_sewa = ?
-          AND status_sewa IN ('disetujui', 'aktif')"
+          AND status_sewa IN ('disetujui', 'lunas')"
       );
 
       if (!$stmt) {

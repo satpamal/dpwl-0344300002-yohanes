@@ -28,4 +28,5 @@ pada P10, saya mengembangkan, menguji:
 24. membuat berkas application\views\admin\pelunasan_detail.php untuk tampilan detail pelunasan.
 25. setelah membuat berkas tampilan daftar pelunasan dan detail pelunasan, saya melanjutkan pengujian halaman daftar pelunasan dan detail pelunasan.
 26. Saya telah mencoba metode transfer untuk pembayaran pelunasan dan berhasil menyimpan data pembayaran pelunasan termasuk bukti transfer.
-27.
+27. membuat berkas application\views\admin\dokumen_transaksi.php untuk tampilan dan cetakan dokumen transaksi.
+28. menguji cetak dokumen transaksi, dan berfungsi dengan baik.
