@@ -21,4 +21,7 @@ pada P10, saya mengembangkan, menguji:
 17. mencatat pembayaran pelunasan yang diterima langsung oleh admin dengan menambahkan method prosesPelunasan(string $kodeSewa) di application\controllers\Pembayaran_controller.php
 18. menampilkan dokumen transaksi yang siap dicetak dengan method dokumenTransaksi(string $kodeSewa) di application\controllers\Pembayaran_controller.php.
 19. melakukan pemeriksaan awal terhadap Controller Pembayaran (application\controllers\Pembayaran_controller.php).
-20.
+20. menambahkan routes untuk pelunasan, cetak dokumen transaksi, detail pelunasan pada application\config\routes.php
+21. menambahkan menu pelunasan untuk admin di application\views\templates\sidebar.php
+22. memastikan bahwa routing daftar pelunasan, route detail pelunasan, route proses pelunasan, route dokumen transaksi, href menu pelunasan sudah benar.
+23.
