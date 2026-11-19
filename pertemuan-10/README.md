@@ -24,4 +24,8 @@ pada P10, saya mengembangkan, menguji:
 20. menambahkan routes untuk pelunasan, cetak dokumen transaksi, detail pelunasan pada application\config\routes.php
 21. menambahkan menu pelunasan untuk admin di application\views\templates\sidebar.php
 22. memastikan bahwa routing daftar pelunasan, route detail pelunasan, route proses pelunasan, route dokumen transaksi, href menu pelunasan sudah benar.
-23.
+23. membuat berkas application\views\admin\pelunasan.php untuk tampilan daftar pelunasan.
+24. membuat berkas application\views\admin\pelunasan_detail.php untuk tampilan detail pelunasan.
+25. setelah membuat berkas tampilan daftar pelunasan dan detail pelunasan, saya melanjutkan pengujian halaman daftar pelunasan dan detail pelunasan.
+26. Saya telah mencoba metode transfer untuk pembayaran pelunasan dan berhasil menyimpan data pembayaran pelunasan termasuk bukti transfer.
+27.
