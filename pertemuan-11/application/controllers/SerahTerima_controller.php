@@ -210,6 +210,9 @@ class SerahTerima_controller extends Controller
     }
   }
 
+  /**
+   * Membatasi method HTTP.
+   */
   private function wajibMetode(string $metodeDiizinkan): void
   {
     $metodeAktif = strtoupper(
@@ -371,5 +374,54 @@ class SerahTerima_controller extends Controller
 
     header('Location: ' . site_url($uri));
     exit;
+  }
+
+  /**
+   * Menghapus file baru jika proses database gagal.
+   */
+  private function hapusFileBaru(array $files): void
+  {
+    foreach ($files as $field => $filename) {
+      $this->hapusSatuFile($field, $filename);
+    }
+  }
+
+  /**
+   * Menghapus file lama setelah file baru berhasil disimpan.
+   */
+  private function hapusFileLama(array $files): void
+  {
+    foreach ($files as $field => $filename) {
+      $this->hapusSatuFile($field, $filename);
+    }
+  }
+
+  /**
+   * Membatasi penghapusan hanya pada nama file yang dibuat
+   * oleh mekanisme unggah dokumen P11.
+   */
+  private function hapusSatuFile(
+    string $field,
+    string $filename
+  ): void {
+    if (!in_array($field, ['ft_ktp', 'ft_sim_a'], true)) {
+      return;
+    }
+
+    $pola = '/^' . preg_quote($field, '/')
+      . '_\d{14}_[a-f0-9]{16}\.(jpg|png|webp)$/';
+
+    if (!preg_match($pola, $filename)) {
+      return;
+    }
+
+    $path = dirname(APPPATH)
+      . DIRECTORY_SEPARATOR . 'uploads'
+      . DIRECTORY_SEPARATOR . 'penyewa'
+      . DIRECTORY_SEPARATOR . $filename;
+
+    if (is_file($path)) {
+      @unlink($path);
+    }
   }
 }
