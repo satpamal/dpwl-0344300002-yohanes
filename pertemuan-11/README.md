@@ -150,6 +150,24 @@ Formulir konfirmasi dikirim menggunakan metode POST ke route proses serah terima
 
 Admin harus memastikan seluruh kendaraan, kunci, dan dokumen pendukung telah diserahkan secara fisik kepada penyewa. Setelah proses berhasil, Model mencatat waktu aktual pengambilan pada `wkt_ambil` dan mengubah status transaksi menjadi `aktif`. Transaksi yang sudah aktif tidak dapat diproses kembali.
 
+### Pengujian Integrasi View Serah Terima
+
+Pengujian dilakukan melalui browser untuk memastikan halaman daftar dan detail serah terima kendaraan terintegrasi dengan Controller, Model, route, dan menu aplikasi.
+
+Hasil pengujian:
+
+- Menu Serah Terima: [hasil pengujian].
+- Halaman daftar transaksi: [hasil pengujian].
+- Halaman detail transaksi: [hasil pengujian].
+- Informasi penyewa, pembayaran, dan kendaraan: [hasil pengujian].
+- Informasi dokumen KTP dan SIM A: [hasil pengujian].
+- Tampilan form serah terima: [hasil pengujian].
+- Pencegahan pemrosesan ulang: [hasil pengujian].
+- Pesan notifikasi: [hasil pengujian].
+
+Catatan atau kendala pengujian:
+[Tuliskan kendala jika ditemukan, atau nyatakan tidak ada kendala berdasarkan hasil pengujian aktual.]
+
 1. membuat application/models/SerahTerima_model.php
 2. membuat application/controllers/SerahTerima_controller.php
 3. menambah route p11 di application\config\routes.php
