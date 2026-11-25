@@ -256,12 +256,12 @@ class SerahTerima_model
       */
       $stmtSewa = $this->db->prepare(
         "SELECT
-          kode_sewa,
-          status_sewa,
-          user_plg
-        FROM t_sewa
-        WHERE kode_sewa = ?
-        FOR UPDATE"
+    kode_sewa,
+    status_sewa,
+    user_plg
+  FROM t_sewa
+  WHERE kode_sewa = ?
+  FOR UPDATE"
       );
 
       if (!$stmtSewa) {
@@ -463,10 +463,10 @@ class SerahTerima_model
       */
       $stmtUpdateSewa = $this->db->prepare(
         "UPDATE t_sewa
-        SET wkt_ambil = ?,
-            status_sewa = 'aktif'
-        WHERE kode_sewa = ?
-          AND status_sewa = 'disetujui'"
+  SET wkt_ambil = ?,
+      status_sewa = 'aktif'
+  WHERE kode_sewa = ?
+    AND status_sewa = 'disetujui'"
       );
 
       if (!$stmtUpdateSewa) {

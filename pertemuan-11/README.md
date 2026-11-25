@@ -42,6 +42,44 @@ Proses serah terima memeriksa status transaksi, validitas pembayaran DP, kelengk
 
 Pengujian fungsional Model: dilanjutkan setelah integrasi Controller, route, dan View.
 
+## D. Implementasi Controller Daftar Serah Terima
+
+### D.1. Menangani Permintaan Daftar Transaksi Serah Terima
+
+Method `index()` dibuat untuk menangani permintaan daftar transaksi yang siap diserahterimakan. Controller mengambil data melalui `getDaftarSerahTerima()` pada Model dan meneruskannya kepada View. Akses dibatasi untuk admin dengan metode HTTP GET.
+
+### D.2. Menangani Permintaan Detail Transaksi Serah Terima
+
+Method `detail()` dibuat untuk menangani permintaan detail transaksi berdasarkan kode sewa. Data transaksi, penyewa, pembayaran, dan kendaraan diambil melalui `getDetailSerahTerima()` pada Model.
+
+### D.3. Menangani Proses Konfirmasi Serah Terima Kendaraan
+
+Method `proses()` dibuat untuk menangani konfirmasi serah terima menggunakan metode POST. Controller memproses unggahan dokumen, mencatat waktu aktual pengambilan, memanggil Model, serta menangani hasil proses dan pesan kepada admin.
+
+### D.4. Memvalidasi Status Transaksi, Pembayaran, dan Persyaratan Serah Terima
+
+Controller memanggil Model untuk memproses validasi status transaksi, pembayaran DP, dokumen KTP dan SIM A, serta keberadaan kendaraan. Jika persyaratan tidak terpenuhi, proses dibatalkan dan pesan kegagalan disampaikan kepada admin.
+
+### D.5. Menerapkan Validasi, Sanitasi, dan Pengendalian Akses
+
+Controller menerapkan pembatasan akses admin, pemeriksaan metode HTTP, serta validasi unggahan dokumen KTP dan SIM A. Dokumen yang diterima berupa JPEG, PNG, atau WEBP dengan ukuran maksimal 5 MB.
+
+### D.6. Menerapkan Pola Post-Redirect-Get (PRG)
+
+Controller menerapkan pola Post-Redirect-Get (PRG) dengan menyimpan pesan sementara pada session dan mengarahkan admin ke halaman tujuan. Pesan ditampilkan satu kali setelah pengalihan.
+
+### D.7. Mencegah Pemrosesan Ulang Serah Terima
+
+Model menerapkan penguncian transaksi dan pemeriksaan status sebelum memproses serah terima. Transaksi yang sudah berubah menjadi aktif tidak dapat diproses kembali.
+
+### D.8 Implementasi Controller Serah Terima
+
+Controller `SerahTerima_controller.php` dibuat untuk menangani permintaan daftar transaksi, detail transaksi, dan konfirmasi serah terima kendaraan.
+
+Controller diintegrasikan dengan `SerahTerima_model` serta menerapkan pengendalian akses admin, pembatasan metode HTTP, validasi unggahan dokumen, dan pola Post-Redirect-Get (PRG).
+
+Pemeriksaan implementasi dilakukan dengan memastikan setiap method Controller menggunakan method Model yang sesuai. Pengujian fungsional melalui browser dilaksanakan setelah integrasi Route, View, dan Controller selesai.
+
 1. membuat application/models/SerahTerima_model.php
 2. membuat application/controllers/SerahTerima_controller.php
 3. menambah route p11 di application\config\routes.php
