@@ -64,6 +64,10 @@ Controller memanggil Model untuk memproses validasi status transaksi, pembayaran
 
 Controller menerapkan pembatasan akses admin, pemeriksaan metode HTTP, serta validasi unggahan dokumen KTP dan SIM A. Dokumen yang diterima berupa JPEG, PNG, atau WEBP dengan ukuran maksimal 5 MB.
 
+Controller menyediakan method `hapusSatuFile()` untuk membatasi penghapusan berkas hanya pada dokumen KTP dan SIM A yang dibuat oleh mekanisme unggah P11. Method `hapusFileBaru()` digunakan untuk membersihkan dokumen baru apabila proses serah terima gagal, sedangkan `hapusFileLama()` digunakan untuk menghapus dokumen lama setelah dokumen penggantinya berhasil disimpan.
+
+Mekanisme ini membantu menjaga konsistensi berkas dokumen dan mencegah penghapusan berkas di luar cakupan unggahan P11.
+
 ### D.6. Menerapkan Pola Post-Redirect-Get (PRG)
 
 Controller menerapkan pola Post-Redirect-Get (PRG) dengan menyimpan pesan sementara pada session dan mengarahkan admin ke halaman tujuan. Pesan ditampilkan satu kali setelah pengalihan.
