@@ -34,6 +34,14 @@ Implementasi direncanakan menggunakan pemisahan tanggung jawab MVC: Model mengel
 
 Analisis ini menjadi dasar implementasi pada bagian C sampai dengan F.
 
+### C. Implementasi Model Serah Terima
+
+Membuat `application/models/SerahTerima_model.php` untuk mengelola pengambilan daftar dan detail transaksi serah terima serta pemrosesan penyerahan kendaraan. Model menggunakan MySQLi, prepared statement, kueri lintas tabel, validasi persyaratan transaksi, dan transaksi basis data.
+
+Proses serah terima memeriksa status transaksi, validitas pembayaran DP, kelengkapan dokumen KTP dan SIM A, serta keberadaan kendaraan. Jika seluruh persyaratan terpenuhi, sistem mencatat waktu aktual pengambilan dan mengubah status transaksi menjadi `aktif`. Status kendaraan tetap `disewa`.
+
+Pengujian fungsional Model: dilanjutkan setelah integrasi Controller, route, dan View.
+
 1. membuat application/models/SerahTerima_model.php
 2. membuat application/controllers/SerahTerima_controller.php
 3. menambah route p11 di application\config\routes.php
